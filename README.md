@@ -8,8 +8,18 @@ Diese Dokumentation ist in spezialisierte Dateien aufgeteilt, damit du schnell g
 
 - **[Wichtige Befehle für die Systemwartung](Wichtige%20Befehle.md)**
   Kernbefehle für das System-Update, die Festplattenverwaltung und die Systembereinigung unter Linux.
+- **[Diagnose und Recovery Tools](Diagnose_und_Recovery_Tools.md)**
+  Festplatten (S.M.A.R.T., CHKDSK), Arbeitsspeicher (memtester) prüfen und gelöschte/verlorene Daten retten (TestDisk).
 - **[Worst-Case-Szenarien & System-Rettung](Worst_Case_Szenarien_Rettung.md)**
   Harte Konsolen-Befehle, um ein totes System (Linux & Windows) wieder zum Leben zu erwecken (Boot-Probleme, Dateisystem voll, etc.).
+- **[Log-Analyse und Monitoring](Log_Analyse_und_Monitoring.md)**
+  Fehler aufspüren via `journalctl`, `/var/log` und Windows Event Logs per PowerShell.
+- **[Server-Dienste und Docker Wartung](Server_Dienste_und_Docker_Wartung.md)**
+  Hintergrunddienste neustarten, verwalten und Docker-Container diagnostizieren.
+- **[Sicherheit und Benutzerverwaltung](Sicherheit_und_Benutzerverwaltung.md)**
+  Benutzer anlegen, Dateirechte (chmod/icacls) reparieren und offene Ports/Verbindungen überwachen.
+- **[Automatisierung und Cronjobs](Automatisierung_und_Cronjobs.md)**
+  Tägliche Aufgaben, Backups und Skripte via `crontab` oder Windows Aufgabenplanung einrichten.
 - **[Softwareinstallation leicht gemacht](Softwareinstallation_leicht_gemacht.md)**
   Eine Übersicht, um nach einer Neuinstallation alle wichtigen Programme mit einem einzigen Befehl zu installieren.
 - **[Netzwerk-Tools für Linux](Linux_Network_Tools_Guide.md)**
