@@ -33,6 +33,8 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Fehlerdiagnose bei vollen Festplatten (df, du, ncdu) und hängenden Systemen (htop, ps, kill).
 - **[06 Benutzerverwaltung und Berechtigungen](02_Linux/06_Benutzerverwaltung.md)**
   Anlage von Nutzern, Sudoers-Pflege (visudo) und Rechtemanagement (chmod, chown).
+- **[07 Docker und Container](02_Linux/07_Docker_und_Container.md)**
+  Ressourcen überwachen, in Container einsteigen und System bereinigen (Prune).
 
 ### 🕵️ 03. Datenrettung und Forensik
 - **[01 Klonen und Imaging](03_Datenrettung_und_Forensik/01_Klonen_und_Imaging.md)**
