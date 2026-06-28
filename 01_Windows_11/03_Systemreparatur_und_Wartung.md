@@ -20,6 +20,12 @@ Nachdem das Image per DISM repariert wurde, werden die lokalen Systemdateien gep
 sfc /scannow
 ```
 
+### 1.3 Komponentenspeicher bereinigen
+Löscht verwaiste Windows-Update-Komponenten und gibt Speicherplatz frei.
+```cmd
+DISM /Online /Cleanup-Image /StartComponentCleanup
+```
+
 ## 2. Dateisystem und Festplatten
 
 ### 2.1 Chkdsk
@@ -102,4 +108,28 @@ Get-EventLog -LogName System -EntryType Error,Critical -Newest 20
 
 # Nach einem bestimmten Fehlercode (z.B. EventID 1001 für Bluescreens) suchen
 Get-EventLog -LogName System | Where-Object {$_.EventID -eq 1001} | Select-Object TimeGenerated, Message -First 5
+```
+
+## 6. Notfallmaßnahmen & Vorbereitung
+
+### 6.1 Wiederherstellungspunkt setzen
+Bevor riskante Skripte oder Änderungen ausgeführt werden:
+```powershell
+Checkpoint-Computer -Description "Manuelle Reparatur" -RestorePointType MODIFY_SETTINGS
+```
+
+### 6.2 Inplace-Upgrade vorbereiten
+Wenn alles fehlschlägt und Windows repariert werden muss, ohne Daten zu verlieren:
+```powershell
+Reg.exe Add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion" /v AllowInplaceUpgrade /t REG_DWORD /f /d 1
+```
+
+### 6.3 PowerShell Ausführungsrichtlinien anpassen
+Oft scheitern Reparaturskripte an fehlenden Rechten:
+```powershell
+# Eigene Rechte prüfen
+whoami /priv
+
+# Skriptausführung erlauben (RemoteSigned)
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 ```

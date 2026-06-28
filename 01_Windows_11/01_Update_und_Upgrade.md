@@ -21,6 +21,30 @@ Install-WindowsUpdate -AcceptAll -AutoReboot
 
 # 5. Spezifisches Update anhand der KB-Nummer installieren
 Install-WindowsUpdate -KBArticleID KB5001234 -AcceptAll
+
+# 6. Treiber-Updates verwalten
+Get-WindowsUpdate -Driver
+Install-WindowsUpdate -Driver -AcceptAll -AutoReboot
+```
+
+### 1.1 Update-Historie und Status
+
+```powershell
+# Letzte Update-Ergebnisse prüfen
+Get-WULastResults
+
+# Installationshistorie anzeigen
+Get-WUHistory | Format-Table -AutoSize
+```
+
+### 1.2 Updates automatisieren (Task-Scheduler)
+
+```powershell
+# Wöchentlichen Update-Task erstellen (z.B. Sonntags 03:00 Uhr)
+Register-ScheduledJob -Name "AutoUpdate" -ScriptBlock {
+    Install-Module PSWindowsUpdate -Force
+    Install-WindowsUpdate -AcceptAll -Install -AutoReboot
+} -Trigger (New-JobTrigger -Weekly -At "Sunday 03:00")
 ```
 
 ## 2. Feature- und Store-Updates erzwingen
@@ -38,4 +62,21 @@ Windows-Upgrades lassen sich per Windows Update Assistent oder per ISO steuern:
 ```cmd
 :: ISO mounten und Upgrade ohne Nutzerinteraktion starten (Unattended)
 setup.exe /auto upgrade /quiet /migratedrivers all /showoobe none /postoobe "C:\skript.bat"
+```
+
+## 3. Problembehandlung (Troubleshooting)
+
+Wenn Windows Update hängt oder fehlschlägt:
+
+```powershell
+# 1. Update-Dienst neu starten
+Restart-Service -Name wuauserv
+
+# 2. Hard-Reset von Windows Update (Dienste stoppen & Cache löschen)
+Stop-Service wuauserv, bits -Force
+Remove-Item "$env:windir\SoftwareDistribution" -Recurse -Force
+Start-Service wuauserv, bits
+
+# 3. Fehlerhaftes Update manuell deinstallieren
+wusa /uninstall /kb:1234567 /quiet
 ```
