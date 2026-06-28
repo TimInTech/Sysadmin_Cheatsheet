@@ -1,8 +1,8 @@
-# 🔐 SSH-Einrichtung für Windows und Linux
+# SSH-Einrichtung für Windows und Linux
 
 Die sichere Remote-Verwaltung von Servern und Clients erfolgt nahezu ausschließlich über SSH (Secure Shell). Hier findest du alle nötigen Befehle, um SSH auf Linux und Windows (via PowerShell) blitzschnell einzurichten und abzusichern.
 
-## 🐧 1. SSH unter Linux einrichten
+## 1. SSH unter Linux einrichten
 
 ### 1.1 SSH-Server (OpenSSH) installieren
 ```bash
@@ -43,7 +43,7 @@ ssh-copy-id benutzer@zielserver-ip
 
 ---
 
-## 🪟 2. SSH unter Windows einrichten (PowerShell)
+## 2. SSH unter Windows einrichten (PowerShell)
 
 Seit Windows 10 (Version 1809) und in Windows 11 sind OpenSSH-Client und -Server integriert, müssen aber oft noch aktiviert werden. **Alle Befehle in einer administrativen PowerShell ausführen.**
 

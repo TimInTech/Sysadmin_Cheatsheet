@@ -1,4 +1,4 @@
-# 🛠️ Wichtige Befehle für die Systemwartung
+# Wichtige Befehle für die Systemwartung
 
 Die Kommandozeile ist ein mächtiges Werkzeug unter Linux. Hier sind die wichtigsten grundlegenden Befehle für Updates, Festplattenverwaltung und Systembereinigung.
 

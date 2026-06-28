@@ -1,10 +1,10 @@
-# 🚨 Worst-Case-Szenarien & System-Rettung
+# Worst-Case-Szenarien & System-Rettung
 
 Wenn nichts mehr geht, helfen oft nur noch harte Konsolen-Befehle, um ein totes System wieder zum Leben zu erwecken. Diese Sammlung enthält die wichtigsten Befehle für Notfälle (Linux & Windows).
 
 ---
 
-## 🐧 1. Linux Notfall-Rettung
+## 1. Linux Notfall-Rettung
 
 ### 1.1 Dateisystem voll (Kein Login möglich, Dienste stürzen ab)
 Wenn `/` (Root) zu 100% belegt ist, streiken viele Dienste. So findest du den Übeltäter:
@@ -76,7 +76,7 @@ echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf
 
 ---
 
-## 🪟 2. Windows Notfall-Rettung (CMD / PowerShell)
+## 2. Windows Notfall-Rettung (CMD / PowerShell)
 
 Diese Befehle müssen in der erweiterten Startumgebung (Computerreparaturoptionen -> Eingabeaufforderung) oder als Administrator in Windows ausgeführt werden.
 
