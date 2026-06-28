@@ -1,16 +1,12 @@
-
 # Softwareinstallation leicht gemacht
 
-## 1. Befehle zur Installation wichtiger und häufig verwendeter 
-Tools
+## 1. Befehle zur Installation wichtiger und häufig verwendeter Tools
+
 ```bash
 # System aktualisieren
 sudo apt update && sudo apt upgrade -y
-```
-```
 
-
-# Installation wichtiger Tools
+# Installation wichtiger Kommandozeilen-Tools
 sudo apt install -y \
     curl \
     wget \
@@ -27,79 +23,64 @@ sudo apt install -y \
     xrdp \
     tmux
 ```
-   ```
+
 ---
 
-# Installation von Snap für zusätzliche Software
-```
+## 2. Installation von Snap für zusätzliche Software
 
+```bash
+# Snap installieren
 sudo apt install -y snapd
 
-# Installation häufiger Anwendungen mit Snap
-
-
-sudo snap install telegram-desktop
-sudo snap install whatsdesk
-sudo snap install vscode --classic
-sudo snap install obs-studio
-sudo snap install shotcut
-sudo snap install spotify
-sudo snap install discord
+# Installation häufiger Anwendungen mit Snap in einem Befehl
+sudo snap install telegram-desktop whatsdesk obs-studio shotcut spotify discord
+sudo snap install code --classic
 ```
 
 ---
 
-## 2. Liste grafischer Tools zur Installation
+## 3. Liste grafischer Tools zur Installation
 
-Hier ist eine umfassende Liste nützlicher grafischer Anwendungen, die installiert werden können:
+Hier ist eine umfassende Liste nützlicher Anwendungen, die installiert werden können, inklusive moderner Alternativen für veraltete Programme:
 
-1. **Netzwerk-IP-Scanner**: `sudo apt install zenmap`
-2. **Telegram Desktop**: `sudo snap install telegram-desktop`
-3. **WhatsApp Desktop (WhatsDesk)**: `sudo snap install whatsdesk`
-4. **XRDP (Remote Desktop Server)**: `sudo apt install xrdp`
-5. **GIMP (Bildbearbeitung)**: `sudo apt install gimp`
-6. **Inkscape (Vektorgrafiken)**: `sudo apt install inkscape`
-7. **LibreOffice (Office Suite)**: `sudo apt install libreoffice`
-8. **VLC Media Player**: `sudo apt install vlc`
-9. **OBS Studio (Screen Recording)**: `sudo snap install obs-studio`
-10. **Shotcut (Video-Editor)**: `sudo snap install shotcut`
-11. **Spotify (Musik-Streaming)**: `sudo snap install spotify`
-12. **Discord (Voice & Text Chat)**: `sudo snap install discord`
-13. **Visual Studio Code (Editor)**: `sudo snap install code --classic`
-14. **Markdown Editor (Typora)**: `sudo snap install typora`
-15. **Krita (Bildbearbeitung)**: `sudo apt install krita`
-16. **Audacity (Audio-Bearbeitung)**: `sudo apt install audacity`
-17. **Remmina (Remote Desktop Client)**: `sudo apt install remmina`
-18. **KeePassXC (Passwort-Manager)**: `sudo apt install keepassxc`
-19. **BleachBit (System-Cleanup)**: `sudo apt install bleachbit`
-20. **Thunderbird (E-Mail-Client)**: `sudo apt install thunderbird`
-21. **FileZilla (FTP-Client)**: `sudo apt install filezilla`
-22. **Steam (Gaming-Plattform)**: `sudo apt install steam`
-23. **qBittorrent (Torrent-Client)**: `sudo apt install qbittorrent`
-24. **VirtualBox (Virtualisierung)**: `sudo apt install virtualbox`
-25. **Etcher (USB-Flasher)**: `sudo apt install balena-etcher`
-26. **Shotwell (Bildbetrachter)**: `sudo apt install shotwell`
-27. **Darktable (Fotobearbeitung)**: `sudo apt install darktable`
-28. **Cheese (Webcam-Tool)**: `sudo apt install cheese`
-29. **KolourPaint (Bildbearbeitung)**: `sudo apt install kolourpaint`
-30. **Kdenlive (Video-Editor)**: `sudo apt install kdenlive`
-31. **OBS Studio (Live-Streaming)**: `sudo snap install obs-studio`
-32. **Zoom (Video-Konferenzen)**: `sudo snap install zoom-client`
-33. **Slack (Team-Kommunikation)**: `sudo snap install slack --classic`
-34. **TeamViewer (Fernwartung)**: `sudo apt install teamviewer`
-35. **Blender (3D-Modellierung)**: `sudo apt install blender`
-36. **Simple Screen Recorder**: `sudo apt install simplescreenrecorder`
-37. **Xournal++ (Notizen)**: `sudo apt install xournalpp`
-38. **Okular (PDF-Reader)**: `sudo apt install okular`
-39. **Foxit Reader (PDF-Reader)**: `sudo snap install foxit-reader`
-40. **Zoom**: `sudo snap install zoom-client`
-41. **Postman (API-Testing)**: `sudo snap install postman`
-42. **Jitsi Meet (Videokonferenzen)**: `sudo snap install jitsi-meet`
-43. **Bitwarden (Passwort-Manager)**: `sudo snap install bitwarden`
-44. **Vivaldi Browser**: `sudo apt install vivaldi`
-45. **Brave Browser**: `sudo apt install brave-browser`
-46. **Opera Browser**: `sudo apt install opera`
-47. **Chromium Browser**: `sudo apt install chromium-browser`
-48. **qView (Bildbetrachter)**: `sudo apt install qview`
-49. **OpenShot (Video-Editor)**: `sudo apt install openshot`
-50. **HandBrake (Video-Konvertierung)**: `sudo apt install handbrake`
+1. **Telegram Desktop**: `sudo snap install telegram-desktop`
+2. **WhatsApp Desktop (WhatsDesk)**: `sudo snap install whatsdesk`
+3. **XRDP (Remote Desktop Server)**: `sudo apt install xrdp`
+4. **GIMP (Bildbearbeitung)**: `sudo apt install gimp`
+5. **Inkscape (Vektorgrafiken)**: `sudo apt install inkscape`
+6. **LibreOffice (Office Suite)**: `sudo apt install libreoffice`
+7. **VLC Media Player**: `sudo apt install vlc`
+8. **OBS Studio (Screen Recording & Streaming)**: `sudo snap install obs-studio`
+9. **Shotcut (Video-Editor)**: `sudo snap install shotcut`
+10. **Spotify (Musik-Streaming)**: `sudo snap install spotify`
+11. **Discord (Voice & Text Chat)**: `sudo snap install discord`
+12. **Visual Studio Code (Editor)**: `sudo snap install code --classic`
+13. **Obsidian (Markdown- & Notizen-Tool - moderner Ersatz für Typora)**: `sudo snap install obsidian --classic`
+14. **Krita (Zeichnen & Bildbearbeitung)**: `sudo apt install krita`
+15. **Audacity (Audio-Bearbeitung)**: `sudo apt install audacity`
+16. **Remmina (Remote Desktop Client)**: `sudo apt install remmina`
+17. **KeePassXC (Passwort-Manager)**: `sudo apt install keepassxc`
+18. **BleachBit (System-Cleanup)**: `sudo apt install bleachbit`
+19. **Thunderbird (E-Mail-Client)**: `sudo apt install thunderbird`
+20. **FileZilla (FTP-Client)**: `sudo apt install filezilla`
+21. **Steam (Gaming-Plattform)**: `sudo apt install steam-installer`
+22. **qBittorrent (Torrent-Client)**: `sudo apt install qbittorrent`
+23. **VirtualBox (Virtualisierung)**: `sudo apt install virtualbox`
+24. **Raspberry Pi Imager (USB-Flasher - moderner Ersatz für Etcher)**: `sudo apt install rpi-imager`
+25. **Shotwell (Bildbetrachter)**: `sudo apt install shotwell`
+26. **Darktable (Fotobearbeitung)**: `sudo apt install darktable`
+27. **Cheese (Webcam-Tool)**: `sudo apt install cheese`
+28. **Kdenlive (Video-Editor)**: `sudo apt install kdenlive`
+29. **Zoom (Video-Konferenzen)**: `sudo snap install zoom-client`
+30. **Slack (Team-Kommunikation)**: `sudo snap install slack --classic`
+31. **Blender (3D-Modellierung)**: `sudo apt install blender`
+32. **Simple Screen Recorder**: `sudo apt install simplescreenrecorder`
+33. **Xournal++ (Notizen)**: `sudo apt install xournalpp`
+34. **Okular (PDF-Reader)**: `sudo apt install okular`
+35. **Postman (API-Testing)**: `sudo snap install postman`
+36. **Jitsi Meet (Videokonferenzen)**: `sudo snap install jitsi-meet`
+37. **Bitwarden (Passwort-Manager)**: `sudo snap install bitwarden`
+38. **Chromium Browser**: `sudo apt install chromium-browser`
+39. **qView (Minimalistischer Bildbetrachter)**: `sudo apt install qview`
+40. **OpenShot (Video-Editor)**: `sudo apt install openshot`
+41. **HandBrake (Video-Konvertierung)**: `sudo apt install handbrake`
