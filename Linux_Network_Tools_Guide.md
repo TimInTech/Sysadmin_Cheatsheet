@@ -218,27 +218,8 @@ sudo apt install arp-scan
    sudo arp-scan --localnet | awk '{print $1, $2}'
    ```
 
-### Weitere grafische Netzwerkscanner:
-
-1. **Zenmap:**
-   - Grafische Benutzeroberfläche für Nmap.
-   ```bash
-   sudo apt install zenmap
-   ```
-2. **Angry IP Scanner:**
-   - Plattformübergreifender Scanner.
-   ```bash
-   sudo dpkg -i ipscan.deb
-   ```
-3. **Wireshark:**
-   - Protokollanalysator.
-4. **EtherApe:**
-   - Echtzeit-Visualisierung.
-   ```bash
-   sudo apt install etherape
-   ```
-5. **LanScan:**
-   - Einfaches Tool zur Anzeige von IP-Adressen.
-
 ---
 
+## Fazit
+
+Die hier vorgestellten Kommandozeilen-Tools sind essenziell für die Arbeit und Wartung von Netzwerken unter Linux. Mit diesen Werkzeugen lassen sich Netzwerke effizient analysieren, Probleme beheben und die Leistung optimieren.
