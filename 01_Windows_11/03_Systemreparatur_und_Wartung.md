@@ -54,3 +54,34 @@ rd /s /q %systemdrive%\Windows.old
 del /q /f /s %temp%\*
 del /q /f /s C:\Windows\Temp\*
 ```
+
+## 4. Häufige Alltagsprobleme schnell lösen
+
+Manchmal hilft ein einfacher Konsolenbefehl, um nervige Bugs zu beseitigen, ohne den PC neu starten zu müssen.
+
+### 4.1 Eingefrorener Windows-Explorer / Taskleiste hängt
+Wenn der Desktop nicht mehr reagiert oder die Taskleiste verschwunden ist:
+```powershell
+# Explorer (die grafische Oberfläche) beenden und sofort neu starten
+Stop-Process -Name explorer -Force; Start-Process explorer
+```
+
+### 4.2 Drucker streikt (Print Spooler)
+Wenn Druckaufträge in der Warteschlange festhängen und sich nicht löschen lassen:
+```cmd
+:: Druckerwarteschlangendienst stoppen
+net stop spooler
+
+:: (Optional: Hängende Druckjobs manuell löschen)
+del /Q /F /S "%systemroot%\System32\Spool\Printers\*.*"
+
+:: Dienst wieder starten
+net start spooler
+```
+
+### 4.3 App Store lädt nicht oder hängt
+Wenn der Microsoft Store keine Apps installiert oder Fehler wirft:
+```cmd
+:: Den Store-Cache zurücksetzen (Öffnet ein leeres CMD-Fenster, schließt sich automatisch)
+wsreset.exe
+```

@@ -51,3 +51,52 @@ sudo btrfs scrub status /
 # Fehlerkorrektur bei unmounted Filesystem
 sudo btrfs check --repair /dev/sda1
 ```
+
+## 4. Eingefrorene UI und Alltags-Bugs
+
+Wenn der Linux-Desktop streikt oder Geräte spinnen, helfen diese schnellen Befehle, ohne direkt rebooten zu müssen (z.B. indem man auf ein anderes TTY via `Ctrl+Alt+F2` wechselt).
+
+### 4.1 Grafische Oberfläche (GUI) ist komplett eingefroren
+Startet den Display-Manager und somit die komplette grafische Sitzung neu (schließt alle grafischen Programme!).
+```bash
+# Für Kubuntu / KDE (sddm)
+sudo systemctl restart sddm
+
+# Für Ubuntu / GNOME (gdm3)
+sudo systemctl restart gdm3
+
+# Für LightDM (XFCE / Linux Mint)
+sudo systemctl restart lightdm
+```
+
+### 4.2 Ein Programm lässt sich nicht schließen (Kill)
+Wenn ein Programm abgestürzt ist und das rote X nicht funktioniert.
+```bash
+# Schritt 1: Finde die Prozess-ID (PID) anhand des Namens (z.B. firefox)
+ps aux | grep firefox
+
+# Schritt 2: Schieße den Prozess gnadenlos ab (ersetze 1234 mit der PID)
+kill -9 1234
+```
+
+### 4.3 Kein Ton / Audio-Bugs
+Sound verschwunden oder knistert? Ein Neustart des Audio-Servers hilft fast immer.
+```bash
+# Bei älteren Systemen mit PulseAudio (Ohne sudo!)
+systemctl --user restart pulseaudio
+
+# Bei neueren Systemen mit PipeWire (z.B. Ubuntu 22.10+) (Ohne sudo!)
+systemctl --user restart pipewire pipewire-pulse
+```
+
+### 4.4 USB-Stick / Hardware wird nicht erkannt
+```bash
+# Live-Kernel-Logs anzeigen (Hilft enorm beim Einstecken von USB-Geräten, um zu sehen, was passiert)
+sudo dmesg -w
+
+# Alle angeschlossenen USB-Geräte auflisten
+lsusb
+
+# Alle PCI-Geräte (WLAN-Karten, Grafikkarten) auflisten
+lspci
+```
