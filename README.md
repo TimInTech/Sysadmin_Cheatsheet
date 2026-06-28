@@ -1,34 +1,47 @@
 # Linux & Windows Befehlssammlung
 
-Willkommen in dieser Sammlung nützlicher Befehle und Anleitungen für die Administration, Wartung und Einrichtung von Linux- und Windows-Systemen.
-
-Diese Dokumentation ist in spezialisierte Dateien aufgeteilt, damit du schnell genau die Befehle findest, die du suchst:
-
-## 📂 Inhaltsverzeichnis
-
-- **[Wichtige Befehle für die Systemwartung](Wichtige%20Befehle.md)**
-  Kernbefehle für das System-Update, die Festplattenverwaltung und die Systembereinigung unter Linux.
-- **[Diagnose und Recovery Tools](Diagnose_und_Recovery_Tools.md)**
-  Festplatten (S.M.A.R.T., CHKDSK), Arbeitsspeicher (memtester) prüfen und gelöschte/verlorene Daten retten (TestDisk).
-- **[Worst-Case-Szenarien & System-Rettung](Worst_Case_Szenarien_Rettung.md)**
-  Harte Konsolen-Befehle, um ein totes System (Linux & Windows) wieder zum Leben zu erwecken (Boot-Probleme, Dateisystem voll, etc.).
-- **[Log-Analyse und Monitoring](Log_Analyse_und_Monitoring.md)**
-  Fehler aufspüren via `journalctl`, `/var/log` und Windows Event Logs per PowerShell.
-- **[Server-Dienste und Docker Wartung](Server_Dienste_und_Docker_Wartung.md)**
-  Hintergrunddienste neustarten, verwalten und Docker-Container diagnostizieren.
-- **[Sicherheit und Benutzerverwaltung](Sicherheit_und_Benutzerverwaltung.md)**
-  Benutzer anlegen, Dateirechte (chmod/icacls) reparieren und offene Ports/Verbindungen überwachen.
-- **[Automatisierung und Cronjobs](Automatisierung_und_Cronjobs.md)**
-  Tägliche Aufgaben, Backups und Skripte via `crontab` oder Windows Aufgabenplanung einrichten.
-- **[Softwareinstallation leicht gemacht](Softwareinstallation_leicht_gemacht.md)**
-  Eine Übersicht, um nach einer Neuinstallation alle wichtigen Programme mit einem einzigen Befehl zu installieren.
-- **[Netzwerk-Tools für Linux](Linux_Network_Tools_Guide.md)**
-  Leitfaden für CLI-Werkzeuge zur Netzwerkdiagnose, Geschwindigkeitsmessung und Portanalyse.
-- **[SSH-Einrichtung für Windows und Linux](SSH_Einrichtung_Windows_Linux.md)**
-  Die wichtigsten Befehle, um SSH auf Linux und Windows (via PowerShell) blitzschnell einzurichten und abzusichern.
-- **[Windows 11: Wartung und Reparatur](windows_11_wartung_und_reparatur.md)**
-  Umfangreiche Befehlssammlung für Update, Reparatur und Wartung von Windows 11-Systemen.
+Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administration, Wartung und Datenrettung von Linux- und Windows-Systemen. 
 
 ---
+
+## Inhaltsverzeichnis
+
+### 🪟 01. Windows 11
+- **[01 Update und Upgrade](01_Windows_11/01_Update_und_Upgrade.md)**
+  PowerShell-Befehle (PSWindowsUpdate), Feature-Updates und Store-Updates erzwingen.
+- **[02 Standardsoftware Deployment](01_Windows_11/02_Standardsoftware_Deployment.md)**
+  Winget-Skripte (JSON), Silent Installs und Windows-Bloatware per Skript entfernen.
+- **[03 Systemreparatur und Wartung](01_Windows_11/03_Systemreparatur_und_Wartung.md)**
+  DISM, SFC-Scans, CHKDSK, Fsutil und automatisierte Bereinigung.
+- **[04 Netzwerk und Reset](01_Windows_11/04_Netzwerk_und_Reset.md)**
+  DNS-Flush, Winsock-Reset, WLAN-Diagnose und IP-Erneuerung.
+
+### 🐧 02. Linux (Kubuntu / Debian-Basis)
+- **[01 Update und Bereinigung](02_Linux/01_Update_und_Bereinigung.md)**
+  apt full-upgrade, Flatpak/Snap Update-Routinen, journalctl-Bereinigung und autoremove.
+- **[02 Systemreparatur](02_Linux/02_Systemreparatur.md)**
+  Abgebrochene dpkg-Konfigurationen abschließen, apt --fix-broken, Grub neu installieren und fsck/btrfs-Checks.
+- **[03 Netzwerk und Dienste](02_Linux/03_Netzwerk_und_Dienste.md)**
+  Systemd-Services steuern, Live-Logs lesen und UFW-Firewall Standardregeln.
+
+### 🕵️ 03. Datenrettung und Forensik
+- **[01 Klonen und Imaging](03_Datenrettung_und_Forensik/01_Klonen_und_Imaging.md)**
+  Bitgenaue Kopien defekter Datenträger (dd, ddrescue) und Images via kpartx mounten.
+- **[02 Dateiwiederherstellung](03_Datenrettung_und_Forensik/02_Dateiwiederherstellung.md)**
+  Partitionstabellen reparieren (TestDisk) und gelöschte Rohdaten wiederherstellen (PhotoRec).
+- **[03 Rechte und Besitz korrigieren](03_Datenrettung_und_Forensik/03_Rechte_und_Besitz_korrigieren.md)**
+  Gesperrte Windows-Partitionen (Dirty Bit) per ntfsfix reparieren und alte Windows-Profile per takeown/icacls übernehmen.
+
+### 🚑 04. Rettungsmedien und Live-Systeme
+- **[01 Ventoy und ISOs](04_Rettungsmedien_und_Live_Systeme/01_Ventoy_und_ISOs.md)**
+  Installation und Pflege eines Ventoy-Sticks inkl. Liste der wichtigsten Admin-ISOs.
+- **[02 Chroot Umgebungen (Linux)](04_Rettungsmedien_und_Live_Systeme/02_Chroot_Umgebungen.md)**
+  Schritt-für-Schritt Anleitung, um aus einem Live-System in eine defekte Linux-Installation einzusteigen (mount --bind /dev, /proc, /sys).
+- **[03 Windows RE (Recovery Environment)](04_Rettungsmedien_und_Live_Systeme/03_Windows_RE.md)**
+  Bootrec, Bcdboot und Offline-SFC/DISM Reparaturen aus der blauen Windows-Kommandozeile.
+
+---
+
+> Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
 
 > **Hinweis:** Alle Dateien sind im Markdown-Format verfasst und optimiert für die Suche. Nutze die Suchfunktion (Strg+F / Cmd+F) in der jeweiligen Datei, um den passenden Befehl schnell zu finden.
