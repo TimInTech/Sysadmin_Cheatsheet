@@ -79,9 +79,27 @@ del /Q /F /S "%systemroot%\System32\Spool\Printers\*.*"
 net start spooler
 ```
 
-### 4.3 App Store lädt nicht oder hängt
-Wenn der Microsoft Store keine Apps installiert oder Fehler wirft:
+## 5. Erweiterte Diagnosen
+
+### 5.1 WMI-Repository reparieren
+Wenn Skripte oder System-Tools unerwartete Fehler werfen, kann das Windows Management Instrumentation (WMI) Repository beschädigt sein.
 ```cmd
-:: Den Store-Cache zurücksetzen (Öffnet ein leeres CMD-Fenster, schließt sich automatisch)
-wsreset.exe
+:: Konsistenz prüfen
+winmgmt /verifyrepository
+
+:: Reparatur versuchen (rettet intakte Teile)
+winmgmt /salvagerepository
+
+:: Komplett zurücksetzen (Vorsicht, kann andere Apps beeinträchtigen!)
+winmgmt /resetrepository
+```
+
+### 5.2 Event-Logs via PowerShell auslesen
+Häufige Abstürze oder Fehler im System lassen sich am besten über das Windows Ereignisprotokoll (Event Viewer) nachvollziehen.
+```powershell
+# Die letzten 20 Fehler- und kritischen Einträge im System-Log anzeigen
+Get-EventLog -LogName System -EntryType Error,Critical -Newest 20
+
+# Nach einem bestimmten Fehlercode (z.B. EventID 1001 für Bluescreens) suchen
+Get-EventLog -LogName System | Where-Object {$_.EventID -eq 1001} | Select-Object TimeGenerated, Message -First 5
 ```
