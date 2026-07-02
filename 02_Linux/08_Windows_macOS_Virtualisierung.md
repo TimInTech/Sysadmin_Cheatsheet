@@ -25,11 +25,32 @@ xdg-open "http://127.0.0.1:8007/" 2>/dev/null || echo "URL: http://127.0.0.1:800
 ```
 
 ### 1.3 Updates (Images aktualisieren)
+
+> **Warnung:** `docker image prune -f` entfernt ungenutzte Images ohne Nachfrage. Vorher VM stoppen, Compose-Datei und Storage sichern und nach dem Update Start sowie Backup testen.
+
 ```bash
 cd ~/windows
+
+# Backup vor Image- und VM-Update
+docker compose down
+tar -czf ~/windows-storage-backup.tgz ./storage docker-compose.yml
+
 docker compose pull
 docker compose up -d
+
+# Nicht mehr referenzierte Images erst nach erfolgreichem Start entfernen
+docker system df
 docker image prune -f
+
+# Verifikation
+docker compose ps
+docker compose logs --tail=100
+
+# Rollback bei fehlerhaftem Update
+docker compose down
+rm -rf ./storage
+tar -xzf ~/windows-storage-backup.tgz -C ~/windows
+docker compose up -d
 ```
 
 ## 2. Einmaliger Start ohne Compose (Beispiel Windows)
@@ -68,6 +89,8 @@ docker compose up -d
 ```
 
 ### 3.2 Backup wiederherstellen
+> **Warnung:** `rm -rf ./storage` löscht die virtuelle Festplatte bzw. den aktuellen VM-Storage. Vorher prüfen, dass das Backup vollständig ist und der Container gestoppt wurde.
+
 ```bash
 cd ~/windows
 docker compose down

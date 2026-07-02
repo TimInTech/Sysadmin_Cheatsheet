@@ -8,6 +8,28 @@ Mit `chroot` bootest du ein funktionierendes Live-Linux vom USB-Stick und "sprin
 
 Angenommen, du hast ein Ubuntu/Mint Live-System gebootet. Deine kaputte Linux-Installation befindet sich auf der Festplattenpartition `/dev/sda2` und deine EFI-Boot-Partition (falls vorhanden) auf `/dev/sda1`.
 
+> **Warnung:** Chroot- und Bootloader-Reparaturen arbeiten direkt auf Partitionen und Bootdaten. Vorher Diagnose ausführen, wichtige Daten sichern und Beispielgeräte wie `/dev/sda` nicht ungeprüft übernehmen.
+
+### Vorab-Diagnose: Datenträger, Bootmodus und Grenzen prüfen
+```bash
+# Dateisysteme, UUIDs, Mountpoints und Subvolumes erkennen
+lsblk -f
+
+# UUIDs und Dateisystem-Metadaten gegenpruefen
+blkid
+
+# UEFI-Boot-Eintraege anzeigen (nur auf UEFI-Systemen sinnvoll)
+efibootmgr -v
+```
+
+Prüfpunkte vor dem Mounten:
+
+- NVMe-Laufwerke heißen meist `/dev/nvme0n1pX`, nicht `/dev/sdaX`.
+- Bei UEFI muss die EFI-Systempartition separat nach `/mnt/boot/efi` gemountet werden.
+- LUKS-verschlüsselte Systeme müssen zuerst entsperrt werden, bevor die Root-Partition sichtbar ist.
+- LVM-Volumes müssen ggf. mit `vgchange -ay` aktiviert werden.
+- Btrfs-Installationen nutzen oft Subvolumes wie `@` oder `@home`; dann ist ein Mount mit `-o subvol=@` nötig.
+
 ### Schritt 1: Das kaputte System mounten
 Zuerst hängen wir die Partition des kaputten Systems ins Dateisystem des Live-Sticks ein.
 ```bash
@@ -42,13 +64,25 @@ sudo chroot /mnt /bin/bash
 Jetzt kannst du das System reparieren:
 
 ### 2.1 Grub (Bootloader) reparieren
+> **Warnung:** `grub-install` schreibt Bootloader-Daten neu. Zielplatte, Bootmodus und EFI-Partition vorher anhand der Diagnose pruefen.
+
 ```bash
+# Backup vor Bootloader-Aenderungen, falls UEFI-System
+efibootmgr -v | tee /root/efibootmgr-before.txt
+tar -czf /root/efi-backup.tgz /boot/efi/EFI
+
 # Grub neu in den MBR / EFI schreiben (Je nach BIOS/UEFI)
 grub-install /dev/sda
 
 # Konfiguration neu generieren
 update-grub
+
+# Verifikation
+grub-install --version
+efibootmgr -v
 ```
+
+Rollback: Bei UEFI die EFI-Dateien aus `/root/efi-backup.tgz` zurueckspielen und Eintraege anhand `/root/efibootmgr-before.txt` rekonstruieren. Bei BIOS/MBR ist ein vorheriges Laufwerksimage der sichere Rueckweg.
 
 ### 2.2 Abgebrochene Updates reparieren
 ```bash

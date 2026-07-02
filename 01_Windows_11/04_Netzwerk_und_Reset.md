@@ -29,18 +29,31 @@ ipconfig /renew
 :: Alle gespeicherten WLAN-Profile anzeigen
 netsh wlan show profiles
 
-:: Das Passwort im Klartext für ein spezifisches WLAN-Profil anzeigen
-netsh wlan show profile name="WLAN-Name" key=clear
+:: Details zu einem gespeicherten WLAN-Profil anzeigen
+netsh wlan show profile name="WLAN-Name"
 
 :: Detaillierten HTML-Report über die WLAN-Historie generieren (hilft bei Abbrüchen)
 netsh wlan show wlanreport
 ```
 
+Klartext-Passwörter nicht in Befehlen dokumentieren oder unnötig ausgeben.
+
 ## 3. Firewall zurücksetzen
 
 Falls ein Programm durch falsche Firewall-Regeln blockiert wird:
 
+> **Warnung:** `netsh advfirewall reset` entfernt angepasste Firewall-Regeln. Vorher Regeln exportieren oder dokumentieren, besonders auf Remote-Systemen.
+
 ```cmd
+:: Backup der aktuellen Firewall-Regeln
+netsh advfirewall export "%USERPROFILE%\Desktop\firewall-backup.wfw"
+
 :: Windows Defender Firewall komplett auf Standardeinstellungen zurücksetzen
 netsh advfirewall reset
+
+:: Verifikation
+netsh advfirewall show allprofiles
+
+:: Rollback
+netsh advfirewall import "%USERPROFILE%\Desktop\firewall-backup.wfw"
 ```

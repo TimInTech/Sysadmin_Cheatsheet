@@ -5,7 +5,12 @@ Die Windows Recovery Environment (WinRE) ist die blaue Reparaturkonsole, die ers
 ## 1. Boot-Probleme beheben (MBR / Legacy BIOS)
 Wenn das System beim Start meldet "Operating System not found" oder "Bootmgr is missing", hilft das Tool `bootrec`.
 
+> **Warnung:** Bootrec- und BCD-Reparaturen schreiben Bootdaten neu. Vorher Bootmodus, Windows-Partition und Datenträger prüfen; bei wichtigen Daten zuerst ein Image oder Backup erstellen.
+
 ```cmd
+:: Backup des aktuellen BCD-Stores, falls lesbar
+bcdedit /export C:\BCD-Backup
+
 :: 1. Den Master Boot Record (MBR) neu schreiben
 bootrec /fixmbr
 
@@ -14,10 +19,18 @@ bootrec /fixboot
 
 :: 3. Nach installierten Windows-Versionen suchen und zur Boot-Datenbank (BCD) hinzufügen
 bootrec /rebuildbcd
+
+:: Verifikation
+bcdedit /enum
+
+:: Rollback
+bcdedit /import C:\BCD-Backup
 ```
 
 ## 2. Boot-Probleme beheben (UEFI / GPT)
 Bei modernen Systemen (UEFI) funktioniert `bootrec /fixboot` oft nicht ("Zugriff verweigert"). Hier muss die versteckte EFI-Partition repariert werden.
+
+> **Warnung:** `diskpart` und `bcdboot` arbeiten direkt an Partitionen und Bootdateien. Laufwerk, EFI-Volume und Windows-Pfad in WinRE immer neu verifizieren, da Laufwerksbuchstaben abweichen können.
 
 ### Schritt 1: EFI-Partition finden und Laufwerksbuchstaben zuweisen
 ```cmd
@@ -51,9 +64,13 @@ Finde heraus, auf welchem Laufwerk Windows installiert ist (in der Konsole ist e
 
 ```cmd
 :: Die Boot-Konfiguration (BCD) auf der EFI-Partition (V:) reparieren
+bcdedit /export C:\BCD-Backup
 bcdboot C:\Windows /s V: /f UEFI
+bcdedit /enum firmware
 ```
 *Danach den PC neu starten.*
+
+Rollback: Falls der vorherige BCD-Store lesbar war, mit `bcdedit /import C:\BCD-Backup` zuruecksetzen. Bei falsch beschriebener EFI-Partition ist ein vorheriges Partitionsimage der verlaessliche Rueckweg.
 
 ## 3. Beschädigte Systemdateien offline reparieren (SFC & DISM)
 

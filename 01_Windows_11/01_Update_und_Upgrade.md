@@ -68,13 +68,25 @@ setup.exe /auto upgrade /quiet /migratedrivers all /showoobe none /postoobe "C:\
 
 Wenn Windows Update hängt oder fehlschlägt:
 
+> **Warnung:** Der Windows-Update-Cache sollte nicht direkt geloescht werden, solange Dienste laufen oder ein Update aktiv installiert. Erst Status pruefen, Ordner umbenennen und nach erfolgreicher Reparatur entfernen.
+
 ```powershell
 # 1. Update-Dienst neu starten
 Restart-Service -Name wuauserv
 
-# 2. Hard-Reset von Windows Update (Dienste stoppen & Cache löschen)
+# 2. Hard-Reset von Windows Update (Dienste stoppen & Cache sichern)
+Stop-Service wuauserv, bits -Force
+Rename-Item "$env:windir\SoftwareDistribution" "SoftwareDistribution.bak"
+Start-Service wuauserv, bits
+
+# 3. Verifikation: Update-Suche erneut starten
+UsoClient StartScan
+Get-Service wuauserv, bits
+
+# Rollback, falls der Reset nicht hilft
 Stop-Service wuauserv, bits -Force
 Remove-Item "$env:windir\SoftwareDistribution" -Recurse -Force
+Rename-Item "$env:windir\SoftwareDistribution.bak" "SoftwareDistribution"
 Start-Service wuauserv, bits
 
 # 3. Fehlerhaftes Update manuell deinstallieren

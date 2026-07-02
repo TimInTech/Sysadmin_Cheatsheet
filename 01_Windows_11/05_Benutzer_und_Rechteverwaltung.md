@@ -7,14 +7,15 @@ In dieser Sammlung finden sich die wichtigsten PowerShell- und CMD-Befehle, um l
 ### Neuen Benutzer anlegen
 Einen neuen lokalen Benutzer mit Passwort erstellen (CMD/PowerShell als Administrator):
 ```powershell
-net user NeuerBenutzername "GeheimesPasswort123!" /add
+$Password = Read-Host "Passwort fuer den neuen Benutzer" -AsSecureString
+New-LocalUser -Name "NeuerBenutzername" -Password $Password -Description "Beschreibung des Kontos"
 ```
 
-Alternativ via moderner PowerShell:
+Alternativ fuer ein Konto ohne Passwort:
 ```powershell
 New-LocalUser -Name "NeuerBenutzername" -Description "Beschreibung des Kontos" -NoPassword
 ```
-*(Hinweis: Für ein Konto mit Passwort wird vorher ein `SecureString` benötigt, weshalb `net user` für schnelle Hacks oft noch präferiert wird).*
+Keine Passwoerter direkt in Befehlen dokumentieren oder in Shell-Historien schreiben.
 
 ### Benutzer in die lokale Administratorgruppe aufnehmen
 ```powershell
@@ -27,7 +28,8 @@ Add-LocalGroupMember -Group "Administratoren" -Member "NeuerBenutzername"
 
 ### Passwort eines Benutzers zurücksetzen
 ```powershell
-net user Benutzername "NeuesPasswort123!"
+$Password = Read-Host "Neues Passwort" -AsSecureString
+Set-LocalUser -Name "Benutzername" -Password $Password
 ```
 
 ### Konto aktivieren oder deaktivieren
@@ -61,6 +63,15 @@ Add-Computer -DomainName "deinedomaene.local" -Credential "deinedomaene\AdminUse
 
 Wenn der Zugriff auf Ordner verweigert wird, können Rechte per Kommandozeile neu gesetzt werden.
 
+> **Warnung:** Rekursive `takeown`- und `icacls`-Befehle verändern Besitz und Berechtigungen ganzer Ordnerbäume. Vorher Pfad, Backup/Snapshot und benötigte Vererbungsregeln prüfen.
+
+Backup und Verifikation vor rekursiven Aenderungen:
+
+```powershell
+icacls "C:\Pfad\Zum" /save "$env:TEMP\acl-backup.txt" /T
+icacls "C:\Pfad\Zum\Ordner"
+```
+
 ### Besitz eines Ordners übernehmen (takeown)
 Übernimmt den Besitz eines Ordners und aller Unterordner für den aktuell angemeldeten Admin:
 ```powershell
@@ -73,3 +84,10 @@ Nachdem der Besitz übernommen wurde, dem lokalen Administrator Vollzugriff gew�
 icacls "C:\Pfad\Zum\Ordner" /grant Administratoren:(OI)(CI)F /T
 ```
 *(OI) = Object Inherit, (CI) = Container Inherit, F = Full Control, /T = Rekursiv.*
+
+Verifikation und Rollback:
+
+```powershell
+icacls "C:\Pfad\Zum\Ordner"
+icacls "C:\Pfad\Zum" /restore "$env:TEMP\acl-backup.txt"
+```

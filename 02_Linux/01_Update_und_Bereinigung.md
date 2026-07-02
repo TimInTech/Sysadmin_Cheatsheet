@@ -58,10 +58,21 @@ sudo snap set system refresh.retain=2
 
 ### 2.3 Journalctl (System Logs) bereinigen
 Systemd-Logs (Journals) können über die Zeit massiv anwachsen.
+
+> **Warnung:** Journal-Vacuum loescht alte Logs dauerhaft. Vorher relevante Fehler exportieren, wenn sie fuer Fehleranalyse, Audit oder Incident Response benoetigt werden.
+
 ```bash
+# Backup/Auszug wichtiger Logs vor dem Loeschen
+journalctl -p warning --since "7 days ago" > ~/journal-warnings-before-vacuum.log
+
 # Logs löschen, die älter als 7 Tage sind
 sudo journalctl --vacuum-time=7d
 
 # Logs auf eine feste Größe (z.B. 100MB) reduzieren
 sudo journalctl --vacuum-size=100M
+
+# Verifikation
+journalctl --disk-usage
 ```
+
+Rollback: Geloeschte Journal-Eintraege lassen sich nicht wiederherstellen. Nur vorher exportierte Logs bleiben verfuegbar.

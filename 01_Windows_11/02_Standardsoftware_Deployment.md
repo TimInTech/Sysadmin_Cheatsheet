@@ -53,7 +53,13 @@ winget import -i C:\temp\software.json --accept-source-agreements --accept-packa
 
 Um Bloatware und vorinstallierte Apps bei einer Neuinstallation loszuwerden, kann PowerShell helfen.
 
+> **Warnung:** `Remove-AppxPackage` entfernt Apps fuer den aktuellen Benutzer, `Remove-AppxProvisionedPackage` entfernt sie fuer neue Benutzerprofile aus dem Online-Image. Vorher Paketliste exportieren und nachher Store-/Standard-App-Funktionen testen.
+
 ```powershell
+# Backup: aktuelle AppX-Paketlisten sichern
+Get-AppxPackage | Select-Object Name, PackageFullName | Export-Csv C:\temp\appx-user-before.csv -NoTypeInformation
+Get-AppxProvisionedPackage -Online | Select-Object DisplayName, PackageName | Export-Csv C:\temp\appx-provisioned-before.csv -NoTypeInformation
+
 # Eine spezifische vorinstallierte App entfernen (z.B. TikTok)
 Get-AppxPackage *tiktok* | Remove-AppxPackage
 
@@ -69,5 +75,14 @@ $bloatware = @(
 )
 foreach ($app in $bloatware) {
     Get-AppxPackage $app | Remove-AppxPackage
+}
+
+# Verifikation
+Get-AppxPackage *tiktok*
+Get-AppxProvisionedPackage -Online | Where-Object DisplayName -like "*tiktok*"
+
+# Rollback fuer entfernte Benutzer-App, falls das Paket noch provisioniert oder verfuegbar ist
+Get-AppxPackage -AllUsers *tiktok* | ForEach-Object {
+    Add-AppxPackage -DisableDevelopmentMode -Register "$($_.InstallLocation)\AppXManifest.xml"
 }
 ```

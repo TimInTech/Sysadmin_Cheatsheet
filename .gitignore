@@ -1,8 +1,16 @@
 *.log
 *.bak
 *.tmp
+*.orig
+*.rej
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
 .env
 .venv/
+.vscode/
+.idea/
 node_modules/
 vendor/bundle/
 .bundle/

@@ -24,6 +24,17 @@ sudo mount -t ntfs-3g /dev/sdb1 /mnt
 
 Wenn du eine alte Windows-Festplatte an einen neuen PC hängst, kannst du oft nicht auf `C:\Users\AlterName` zugreifen ("Sie verfügen momentan nicht über die Berechtigung..."). Die GUI braucht dafür extrem lange. Über die CMD (als Administrator) geht das in Sekunden.
 
+> **Warnung:** Rekursive `takeown`- und `icacls`-Befehle verändern Besitz und NTFS-Rechte ganzer Profilbäume. Vorher Laufwerksbuchstaben, Zielpfad und Backup/Image prüfen.
+
+```cmd
+:: Backup der aktuellen ACLs vor Aenderungen
+icacls "D:\Users" /save "%TEMP%\users-acl-backup.txt" /T
+
+:: Verifikation des Zielpfads
+dir "D:\Users\AlterName"
+icacls "D:\Users\AlterName"
+```
+
 ### Schritt 1: Besitz übernehmen (takeown)
 Zuerst muss der neue Administrator (du) der Besitzer (Owner) des Ordners und aller Unterordner werden.
 
@@ -42,4 +53,11 @@ icacls "D:\Users\AlterName" /grant Administratoren:(OI)(CI)F /T
 
 :: Falls die Berechtigungen völlig kaputt sind, Vererbung zurücksetzen:
 icacls "D:\Users\AlterName" /reset /T /C /Q
+```
+
+Rollback:
+
+```cmd
+icacls "D:\Users" /restore "%TEMP%\users-acl-backup.txt"
+icacls "D:\Users\AlterName"
 ```

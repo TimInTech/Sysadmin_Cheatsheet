@@ -45,9 +45,16 @@ docker exec -it container_name sh
 
 Docker kann mit der Zeit extrem viel Speicherplatz durch alte Images, ungenutzte Volumes und gestoppte Container belegen.
 
+> **Warnung:** `docker system prune -a --volumes` löscht ungenutzte Images und Volumes. Vorher `docker system df`, Compose-Projekte, Backups und Volume-Inhalte prüfen.
+
 ```bash
 # Zeigt, wie viel Platz Docker aktuell belegt
 docker system df
+
+# Backup/Inventar vor dem Loeschen
+docker ps -a > docker-containers-before-prune.txt
+docker images > docker-images-before-prune.txt
+docker volume ls > docker-volumes-before-prune.txt
 
 # Entfernt ALLE gestoppten Container, ungenutzten Netzwerke und baumelnden Images
 docker system prune
@@ -55,7 +62,13 @@ docker system prune
 # Radikal: Entfernt zusätzlich alle nicht verwendeten Volumes und ALLE ungenutzten Images 
 # (ACHTUNG: Kann Daten aus gestoppten Projekten löschen!)
 docker system prune -a --volumes
+
+# Verifikation
+docker system df
+docker ps -a
 ```
+
+Rollback: Geloeschte Container-Metadaten, Images und Volumes sind lokal nicht garantiert wiederherstellbar. Images muessen erneut aus Registry/Build geladen werden; Volume-Daten nur aus vorherigem Backup.
 
 ## 5. Docker-Dienst / Daemon Probleme
 

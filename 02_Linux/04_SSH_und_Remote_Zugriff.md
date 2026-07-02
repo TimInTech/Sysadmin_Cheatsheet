@@ -7,6 +7,9 @@ Bei der Remote-Administration via Secure Shell (SSH) treten oft Berechtigungs- o
 Wenn eine Verbindung abgelehnt wird (`Connection refused`), sollte zuerst auf der Konsole (oder über ein KVM/IPMI-Interface) der Dienst geprüft werden:
 
 ```bash
+# Distro-abhaengigen Servicenamen zuerst ermitteln (haeufig ssh oder sshd)
+systemctl list-unit-files 'ssh*.service'
+
 # Status des SSH-Dienstes abfragen
 systemctl status sshd
 

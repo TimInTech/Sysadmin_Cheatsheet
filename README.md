@@ -1,6 +1,14 @@
 # Linux & Windows Befehlssammlung
 
-Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administration, Wartung und Datenrettung von Linux- und Windows-Systemen. 
+Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administration, Wartung und Datenrettung von Linux- und Windows-Systemen.
+
+---
+
+## Sicherheitshinweis
+
+> **Warnung:** Viele Admin-, Recovery- und Reparaturbefehle in dieser Sammlung können Daten löschen, Systeme unbootbar machen oder Netzwerk-/Zugriffsregeln zurücksetzen.
+> Vor Änderungen an Bootloader, BCD/GRUB, Dateisystemen, Partitionen, Firewall-Regeln, Benutzerrechten, Docker-Volumes oder Windows-Reparaturfunktionen immer zuerst Diagnose durchführen und ein Backup, Snapshot oder Image erstellen.
+> Beispielgeräte wie `/dev/sda`, `/dev/sdb` oder Laufwerksbuchstaben aus der Windows-Recovery-Umgebung nie ungeprüft kopieren. Zielgeräte immer mit Diagnosebefehlen verifizieren.
 
 ---
 
@@ -19,6 +27,12 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   PowerShell/CMD für lokale Nutzer, Gruppen, Domänen-Beitritt und NTFS-Besitz (takeown, icacls).
 - **[06 AppX und Store Reparatur](01_Windows_11/06_AppX_und_Store_Reparatur.md)**
   Windows-Store Reset und PowerShell-Skripte zum Neu-Registrieren von Standard-Apps.
+- **[07 Registry Tweaks und Optimierung](01_Windows_11/07_Registry_Tweaks_und_Optimierung.md)**
+  Registry-Backups, Explorer-/Taskleisten-Tweaks und vorsichtige Optimierung.
+- **[08 ISO Erstellung und Custom OS](01_Windows_11/08_ISO_Erstellung_und_Custom_OS.md)**
+  Windows-ISOs bereitstellen, Images bearbeiten und Installationsmedien vorbereiten.
+- **[09 BitLocker und TPM](01_Windows_11/09_BitLocker_und_TPM.md)**
+  BitLocker-Status, TPM-Pruefung, Recovery-Key-Absicherung und Wartungsfenster.
 
 ### 🐧 02. Linux (Kubuntu / Debian-Basis)
 - **[01 Update und Bereinigung](02_Linux/01_Update_und_Bereinigung.md)**
@@ -35,6 +49,16 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Anlage von Nutzern, Sudoers-Pflege (visudo) und Rechtemanagement (chmod, chown).
 - **[07 Docker und Container](02_Linux/07_Docker_und_Container.md)**
   Ressourcen überwachen, in Container einsteigen und System bereinigen (Prune).
+- **[08 Windows und macOS in Docker](02_Linux/08_Windows_macOS_Virtualisierung.md)**
+  dockurr-VMs betreiben, sichern und wiederherstellen.
+- **[09 systemd Timer und Journal](02_Linux/09_Systemd_Timer_und_Journal.md)**
+  Wiederkehrende Jobs mit systemd-Timern, Logs und Journal-Aufbewahrung.
+- **[10 Backup mit restic](02_Linux/10_Backup_mit_Restic.md)**
+  Verschluesselte Backups, Integritaetspruefung, Restore-Test und Retention.
+- **[11 nftables Firewall](02_Linux/11_Nftables_Firewall.md)**
+  Host-Firewall mit Backup, Remote-Rollback, Syntaxcheck und Verifikation.
+- **[12 TLS-Zertifikate und OpenSSL](02_Linux/12_TLS_Zertifikate_und_OpenSSL.md)**
+  Zertifikate, Chains, CSRs, Private-Key-Schutz und sicherer Zertifikatstausch.
 
 ### 🕵️ 03. Datenrettung und Forensik
 - **[01 Klonen und Imaging](03_Datenrettung_und_Forensik/01_Klonen_und_Imaging.md)**

@@ -7,10 +7,13 @@ Wartung von Hintergrunddiensten und Netzwerksicherheit.
 Nahezu alle modernen Linux-Distributionen (Ubuntu, Debian, CentOS) nutzen `systemd` zur Verwaltung von Hintergrunddiensten.
 
 ```bash
+# Distro-abhaengigen SSH-Servicenamen zuerst ermitteln
+systemctl list-unit-files 'ssh*.service'
+
 # Status eines Dienstes abfragen (z.B. SSH-Server)
 sudo systemctl status ssh
 
-# Dienst neu starten (hilft oft bei Konfigurationsfehlern)
+# Dienst neu starten (Name kann je nach Distribution ssh oder sshd sein)
 sudo systemctl restart ssh
 
 # Dienst stoppen / starten

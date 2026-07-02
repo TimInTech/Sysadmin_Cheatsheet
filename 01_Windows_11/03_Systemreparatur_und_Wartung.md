@@ -49,7 +49,13 @@ fsutil dirty query C:
 
 Festplattenplatz freigeben, ohne durch grafische Menüs zu navigieren.
 
+> **Warnung:** `rd /s /q` und `del /s` löschen rekursiv und ohne Rueckfrage. Pfade vorher mit `dir` pruefen und wichtige Daten sichern.
+
 ```cmd
+:: Backup/Pruefung: Zielpfade anzeigen und Windows.old bei Bedarf extern sichern
+dir %systemdrive%\
+dir %temp%
+
 :: Bereinigungswerkzeug aufrufen (Silent Mode)
 cleanmgr /sagerun:1
 
@@ -59,7 +65,13 @@ rd /s /q %systemdrive%\Windows.old
 :: Temporäre Dateien radikal löschen
 del /q /f /s %temp%\*
 del /q /f /s C:\Windows\Temp\*
+
+:: Verifikation
+dir %systemdrive%\
+dir %temp%
 ```
+
+Rollback: Manuell geloeschte Ordner wie `Windows.old` lassen sich nur aus einem vorherigen Backup oder Systemimage wiederherstellen.
 
 ## 4. Häufige Alltagsprobleme schnell lösen
 
@@ -74,16 +86,27 @@ Stop-Process -Name explorer -Force; Start-Process explorer
 
 ### 4.2 Drucker streikt (Print Spooler)
 Wenn Druckaufträge in der Warteschlange festhängen und sich nicht löschen lassen:
+
+> **Warnung:** Der optionale `del /S`-Befehl löscht alle Dateien in der Druckerwarteschlange ohne Rueckfrage. Pfad vor dem Ausführen prüfen.
+
 ```cmd
 :: Druckerwarteschlangendienst stoppen
 net stop spooler
+
+:: Backup der aktuellen Warteschlange fuer Analyse/Rollback
+xcopy "%systemroot%\System32\Spool\Printers" "%temp%\Printers-Spool-Backup" /E /I /H
 
 :: (Optional: Hängende Druckjobs manuell löschen)
 del /Q /F /S "%systemroot%\System32\Spool\Printers\*.*"
 
 :: Dienst wieder starten
 net start spooler
+
+:: Verifikation
+dir "%systemroot%\System32\Spool\Printers"
 ```
+
+Rollback: Falls ein Auftrag faelschlich geloescht wurde, Dateien aus `%temp%\Printers-Spool-Backup` zurueckkopieren und den Spooler erneut starten.
 
 ## 5. Erweiterte Diagnosen
 
