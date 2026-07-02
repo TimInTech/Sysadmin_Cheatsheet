@@ -78,6 +78,18 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[03 Windows RE (Recovery Environment)](04_Rettungsmedien_und_Live_Systeme/03_Windows_RE.md)**
   Bootrec, Bcdboot und Offline-SFC/DISM Reparaturen aus der blauen Windows-Kommandozeile.
 
+### 🖥️ 05. Proxmox VE
+- **[01 Status, Versionen und Logs](05_Proxmox_VE/01_Status_Versionen_und_Logs.md)**
+  Erstdiagnose mit `pveversion`, systemd, Journal, Storage, Clusterstatus und Gastübersicht.
+- **[02 Virtuelle Maschinen mit qm](05_Proxmox_VE/02_VM_QM_Befehle.md)**
+  VM-Status, Start/Shutdown, Snapshots, Rollback, Guest Agent und Konfigurationssicherung.
+- **[03 LXC-Container mit pct](05_Proxmox_VE/03_LXC_PCT_Befehle.md)**
+  Containerstatus, privilegiert/unprivilegiert, Start/Shutdown, Snapshots und Containerdiagnose.
+- **[04 Storage, Backup und Restore](05_Proxmox_VE/04_Storage_Backup_und_Restore.md)**
+  Storageprüfung, `vzdump`, Restore-Vorbereitung, `qmrestore`, `pct restore` und Verifikation.
+- **[05 Netzwerk, Firewall und Cluster](05_Proxmox_VE/05_Netzwerk_Firewall_und_Cluster.md)**
+  Bridges, Interfaces, Firewallstatus, Clusterstatus, Quorum-Hinweise und Rollback.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
