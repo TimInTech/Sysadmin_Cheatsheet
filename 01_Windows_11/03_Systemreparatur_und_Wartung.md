@@ -133,6 +133,31 @@ Get-EventLog -LogName System -EntryType Error,Critical -Newest 20
 Get-EventLog -LogName System | Where-Object {$_.EventID -eq 1001} | Select-Object TimeGenerated, Message -First 5
 ```
 
+### 5.3 Erweiterte Event-Abfrage mit Get-WinEvent
+
+```powershell
+# Kritische Fehler der letzten 7 Tage (schneller als Get-EventLog)
+Get-WinEvent -FilterHashtable @{LogName='System'; Level=1,2; StartTime=(Get-Date).AddDays(-7)} |
+  Select-Object TimeCreated, Id, ProviderName, Message -First 50
+
+# Application-Events filtern
+Get-WinEvent -FilterHashtable @{LogName='Application'; Level=1,2; StartTime=(Get-Date).AddDays(-7)} |
+  Select-Object TimeCreated, Id, ProviderName, Message -First 50
+```
+
+### 5.4 Dienste und Tasks verwalten
+
+```powershell
+# Alle Dienste sortiert anzeigen
+Get-Service | Sort-Object Status, Name
+
+# Nur gestoppte Dienste anzeigen
+Get-Service | Where-Object Status -eq 'Stopped'
+
+# Nicht deaktivierte Scheduled Tasks anzeigen
+Get-ScheduledTask | Where-Object State -ne 'Disabled' | Select-Object TaskName, TaskPath, State
+```
+
 ## 6. Notfallmaßnahmen & Vorbereitung
 
 ### 6.1 Wiederherstellungspunkt setzen

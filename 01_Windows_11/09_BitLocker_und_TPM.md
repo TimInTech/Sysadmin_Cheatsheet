@@ -10,7 +10,8 @@ Quellen:
 ## 1. Status und Schutzmechanismen pruefen
 
 ```powershell
-# BitLocker-Status aller Laufwerke anzeigen
+# BitLocker-Status über PowerShell-Cmdlet und CLI
+Get-BitLockerVolume
 manage-bde -status
 
 # Schutzmechanismen fuer C: anzeigen
@@ -114,4 +115,14 @@ Rollback:
 ```powershell
 # Schutz nach Abschluss wieder aktivieren, wenn die Deaktivierung nur temporaer war
 manage-bde -on D: -RecoveryPassword
+```
+
+## 6. Microsoft Defender Status
+
+```powershell
+# Defender-Status und letzter Scan
+Get-MpComputerStatus
+
+# Aktuelle Defender-Konfiguration
+Get-MpPreference
 ```

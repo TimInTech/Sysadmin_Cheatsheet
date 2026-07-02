@@ -33,6 +33,8 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Windows-ISOs bereitstellen, Images bearbeiten und Installationsmedien vorbereiten.
 - **[09 BitLocker und TPM](01_Windows_11/09_BitLocker_und_TPM.md)**
   BitLocker-Status, TPM-Pruefung, Recovery-Key-Absicherung und Wartungsfenster.
+- **[10 PowerShell-Diagnose](01_Windows_11/10_PowerShell_Diagnose.md)**
+  Systeminfo, Event-Logs, Dienste, Tasks, Netzwerkdiagnose, BitLocker und Defender per PowerShell.
 
 ### 🐧 02. Linux (Kubuntu / Debian-Basis)
 - **[01 Update und Bereinigung](02_Linux/01_Update_und_Bereinigung.md)**
@@ -59,6 +61,34 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Host-Firewall mit Backup, Remote-Rollback, Syntaxcheck und Verifikation.
 - **[12 TLS-Zertifikate und OpenSSL](02_Linux/12_TLS_Zertifikate_und_OpenSSL.md)**
   Zertifikate, Chains, CSRs, Private-Key-Schutz und sicherer Zertifikatstausch.
+- **[13 tcpdump und nmap](02_Linux/13_Tcpdump_und_Nmap.md)**
+  Paketmitschnitt (tcpdump), Netzwerkscans (nmap), BPF-Filter, NSE-Skripte und Diagnose-Workflows.
+- **[14 Systeminformationen](02_Linux/14_Systeminformationen.md)**
+  Distro, Kernel, Bootmodus, Architektur, Hardware und Zeit/Locale.
+- **[15 APT Repository und Paketstatus](02_Linux/15_APT_Repository_und_Paketstatus.md)**
+  Paketquellen, Keyrings, Upgrade-Simulation und Reparatur von Paketverwaltung.
+- **[16 Kernel Boot und Initramfs](02_Linux/16_Kernel_Boot_und_Initramfs.md)**
+  Kernel-Versionen, Bootmeldungen, Initramfs neu erzeugen und GRUB-Verifikation.
+- **[17 AppArmor SELinux cgroupv2](02_Linux/17_AppArmor_SELinux_cgroupv2.md)**
+  Sicherheitsprofile, LSM-Status und Container-Kompatibilitaet (cgroup v2).
+- **[18 rsync](02_Linux/18_rsync.md)**
+  Dateisynchronisation mit Dry-Run, Backup und Warnung vor --delete.
+- **[19 BorgBackup](02_Linux/19_BorgBackup.md)**
+  Deduplizierende Backups mit Borg: Init, Create, Check, Extract und Prune.
+- **[20 Fail2ban](02_Linux/20_Fail2ban.md)**
+  Brute-Force-Schutz: Status, Jails, Logs und Entsperren.
+- **[21 Audit Logs](02_Linux/21_Audit_Logs.md)**
+  Auth-, Sudo-, Auditd- und Login-Logs auswerten.
+- **[22 Secret Hygiene](02_Linux/22_Secret_Hygiene.md)**
+  Shell-History, Git-Grep nach Secrets und .env-Dateien absichern.
+- **[23 DNS-Diagnose](02_Linux/23_DNS_Diagnose.md)**
+  Resolverstatus, systemd-resolved, dig, getent hosts und DNS-Server-Test.
+- **[24 Pi-Hole und Unbound](02_Linux/24_PiHole_und_Unbound.md)**
+  Pi-Hole Status/Logs, Unbound-Diagnose, Client-DNS und Split-DNS.
+- **[25 NetworkManager und Netplan](02_Linux/25_NetworkManager_und_Netplan.md)**
+  Netzwerkstack erkennen (NetworkManager/systemd-networkd) und Netplan pruefen.
+- **[26 DHCP mDNS Avahi](02_Linux/26_DHCP_mDNS_Avahi.md)**
+  DHCP-Leases, mDNS-Diensterkennung und Avahi-Status.
 
 ### 🕵️ 03. Datenrettung und Forensik
 - **[01 Klonen und Imaging](03_Datenrettung_und_Forensik/01_Klonen_und_Imaging.md)**
@@ -89,6 +119,30 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Storageprüfung, `vzdump`, Restore-Vorbereitung, `qmrestore`, `pct restore` und Verifikation.
 - **[05 Netzwerk, Firewall und Cluster](05_Proxmox_VE/05_Netzwerk_Firewall_und_Cluster.md)**
   Bridges, Interfaces, Firewallstatus, Clusterstatus, Quorum-Hinweise und Rollback.
+
+### 🧹 06. Git-Repo-Hygiene
+- **[01 Repo-Checkliste](06_Git_Repo_Hygiene/01_Repo_Checkliste.md)**
+  Git-Status, Branch-Hygiene, Commit- und Remote-Prüfung.
+- **[02 Secret Hygiene](06_Git_Repo_Hygiene/02_Secret_Hygiene.md)**
+  Secrets in Repos erkennen, gitleaks/history-Scan und .gitignore.
+- **[03 Markdownlint und Linkcheck](06_Git_Repo_Hygiene/03_Markdownlint_und_Linkcheck.md)**
+  CI-Integration, lokaler Lint und Linkprüfung für Doku-Repos.
+- **[04 Branch Protection und Rulesets](06_Git_Repo_Hygiene/04_Branch_Protection_Rulesets.md)**
+  Branch-Regeln, required reviews und Status-Checks.
+- **[05 PR- und Release-Checkliste](06_Git_Repo_Hygiene/05_PR_und_Release_Checkliste.md)**
+  Pull-Request-Vorlage, Changelog und Release-Workflow.
+
+### 🌍 07. Webserver Reverse Proxy TLS
+- **[01 Nginx-Diagnose](07_Webserver_Reverse_Proxy_TLS/01_Nginx_Diagnose.md)**
+  Nginx-Status, Konfigurationstest und Fehlersuche.
+- **[02 Caddy-Diagnose](07_Webserver_Reverse_Proxy_TLS/02_Caddy_Diagnose.md)**
+  Caddy-Status, Logs und Konfigurationsprüfung.
+- **[03 TLS-Zertifikate und ACME](07_Webserver_Reverse_Proxy_TLS/03_TLS_Zertifikate_ACME.md)**
+  Let's Encrypt, certbot, Zertifikatserneuerung und Chain-Prüfung.
+- **[04 Reverse-Proxy-Fehlerbilder](07_Webserver_Reverse_Proxy_TLS/04_Reverse_Proxy_Fehlerbilder.md)**
+  502/503/504, Backend-Diagnose und Timeout-Ursachen.
+- **[05 Config-Test, Reload und Rollback](07_Webserver_Reverse_Proxy_TLS/05_Config_Test_Reload_Rollback.md)**
+  Syntax-Prüfung, sicherer Reload und Rollback bei Fehlkonfiguration.
 
 ---
 

@@ -72,20 +72,31 @@ Backup:
 tar --mode=600 -czf server-key-backup.tgz server.key server.csr
 ```
 
-## 5. Zertifikat austauschen mit Rueckweg
-
-> **Warnung:** Ein falsches Zertifikat oder ein nicht passender Key kann Webserver, Mailserver oder interne APIs sofort stoeren. Vor dem Austausch alte Dateien sichern und Konfiguration testen.
+## 4.1 ACME / Certbot (Let's Encrypt)
 
 ```bash
-# Bestehende Dateien sichern
-sudo cp -a /etc/nginx/tls/server.crt /etc/nginx/tls/server.crt.bak
-sudo cp -a /etc/nginx/tls/server.key /etc/nginx/tls/server.key.bak
+# Alle verwalteten Zertifikate anzeigen
+certbot certificates 2>/dev/null || true
 
-# Neue Dateien installieren
-sudo install -m 644 server.crt /etc/nginx/tls/server.crt
-sudo install -m 600 server.key /etc/nginx/tls/server.key
+# Automatische Verlängerung prüfen (Timer)
+systemctl list-timers | grep -i certbot || true
 
-# Dienstkonfiguration testen
+# Trockenlauf der Verlängerung
+certbot renew --dry-run
+```
+
+## 5. Config Test, Reload und Rollback
+
+> **Warnung:** Ein falsches Zertifikat oder eine fehlerhafte Konfiguration kann Webserver, Mailserver oder interne APIs sofort stoeren. Vor dem Austausch Konfiguration sichern und testen.
+
+### 5.1 Nginx
+
+```bash
+# Vollständige Konfiguration sichern
+sudo mkdir -p /root/webserver-config-backups
+sudo tar czf /root/webserver-config-backups/nginx-$(date +%Y%m%d-%H%M%S).tar.gz /etc/nginx
+
+# Konfiguration testen
 sudo nginx -t
 
 # Reload ohne laufende Verbindungen hart zu beenden
@@ -102,8 +113,19 @@ openssl s_client -connect example.com:443 -servername example.com </dev/null 2>/
 Rollback:
 
 ```bash
-sudo mv /etc/nginx/tls/server.crt.bak /etc/nginx/tls/server.crt
-sudo mv /etc/nginx/tls/server.key.bak /etc/nginx/tls/server.key
+sudo tar xzf /root/webserver-config-backups/nginx-latest.tar.gz -C /
 sudo nginx -t
 sudo systemctl reload nginx
+```
+
+### 5.2 Caddy
+
+```bash
+sudo mkdir -p /root/webserver-config-backups
+sudo tar czf /root/webserver-config-backups/caddy-$(date +%Y%m%d-%H%M%S).tar.gz /etc/caddy
+
+# Caddyfile validieren
+caddy validate --config /etc/caddy/Caddyfile 2>/dev/null || sudo caddy validate --config /etc/caddy/Caddyfile
+
+sudo systemctl reload caddy
 ```

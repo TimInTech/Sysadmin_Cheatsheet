@@ -2,6 +2,19 @@
 
 Standardbefehle zur Verwaltung von Benutzern, Gruppen und Admin-Rechten (`sudo`) unter Debian/Ubuntu basierten Systemen.
 
+## 0. Benutzer und Gruppen anzeigen
+
+```bash
+# Alle lokalen Benutzer mit UID und Shell anzeigen
+getent passwd | cut -d: -f1,3,7 | column -t -s:
+
+# Admin-Gruppen prüfen
+getent group sudo wheel admin 2>/dev/null
+
+# Eigene sudo-Rechte prüfen
+sudo -l
+```
+
 ## 1. Benutzerverwaltung
 
 ### Neuen Benutzer anlegen
@@ -39,7 +52,14 @@ groups benutzername
 ## 3. Sudoers-Datei bearbeiten (visudo)
 Wenn spezifischere Berechtigungen (z. B. Ausführen eines Befehls *ohne* Passwortabfrage) konfiguriert werden sollen, **immer** `visudo` nutzen. Es prüft die Syntax vor dem Speichern!
 ```bash
+# Sudoers-Datei bearbeiten
 sudo visudo
+
+# Syntax der aktuellen Sudoers-Datei prüfen
+sudo visudo -cf /etc/sudoers
+
+# Auch alle Include-Dateien prüfen
+find /etc/sudoers.d -maxdepth 1 -type f -exec sudo visudo -cf {} \;
 ```
 *Beispiel-Eintrag am Ende der Datei (Nutzer darf `systemctl restart nginx` ohne Passwort ausführen):*
 `benutzername ALL=(ALL) NOPASSWD: /bin/systemctl restart nginx`
