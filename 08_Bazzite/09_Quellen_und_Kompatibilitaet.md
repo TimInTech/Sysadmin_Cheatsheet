@@ -50,4 +50,3 @@ podman version
 ```
 
 Wenn ein Befehl fehlt, nicht automatisch aus einer beliebigen Quelle nachinstallieren. Zuerst Bazzite-Version, Imagevariante und aktuelle offizielle Dokumentation abgleichen.
-
