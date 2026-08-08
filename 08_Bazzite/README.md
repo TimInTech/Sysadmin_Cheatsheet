@@ -69,4 +69,3 @@ df -hT
 - `dnf`/`dnf5` im Host ist nicht der normale Installationsweg. In einer Distrobox ist es dagegen korrekt.
 - `podman-compose` oder `podman compose` können Compose-Dateien ausführen; für dauerhaft verwaltete Dienste empfiehlt Bazzite Quadlet.
 - Ein früheres Deployment setzt das Betriebssystem zurück, nicht `/home`, Flatpak-App-Daten oder Container-Volumes.
-
