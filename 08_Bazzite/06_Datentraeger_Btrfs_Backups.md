@@ -172,4 +172,3 @@ cmp "$HOME/TESTDATEI" "$HOME/restore-test/home/$USER/TESTDATEI"
 ```
 
 > **TIPP:** Pika Backup oder Déjà Dup sind für Desktopnutzer geeignete Flatpak-Oberflächen. Borg/Restic eignen sich für reproduzierbare CLI-Backups. Das Ziel muss extern und regelmäßig getrennt oder schreibgeschützt sein.
-
