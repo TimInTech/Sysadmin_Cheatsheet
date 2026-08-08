@@ -185,4 +185,3 @@ test -s ~/bazzite-health.txt && wc -l ~/bazzite-health.txt
 ```
 
 Rollback: Es wurde nur die Datei `~/bazzite-health.txt` erstellt. Sie kann nach Prüfung auf sensible Angaben mit `rm -i ~/bazzite-health.txt` entfernt werden.
-
