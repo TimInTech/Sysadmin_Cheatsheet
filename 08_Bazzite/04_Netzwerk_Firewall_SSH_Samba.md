@@ -272,4 +272,3 @@ sudo firewall-cmd --runtime-to-permanent
 ```
 
 `LAN_CIDR` ist ein **PLATZHALTER**, zum Beispiel das tatsächlich geprüfte Heimnetz. Verifikation mit `smbclient`, `ss -tulpn`, Containerlogs und einem zweiten Client.
-
