@@ -203,4 +203,3 @@ podman secret ls
 > **TIPP:** SELinux aktiviert lassen, Flatpak-Rechte minimieren, Container rootless/unprivilegiert betreiben, unbekannte Ports schließen und automatische Updates nicht ohne belastbaren Ersatz deaktivieren.
 
 > **WARNUNG:** Keine generischen Hardening-Skripte anwenden, die SELinux, Secure Boot, Gamescope, InputPlumber, PipeWire, Steam-Namespaces oder Bazzite-Updater verändern.
-
