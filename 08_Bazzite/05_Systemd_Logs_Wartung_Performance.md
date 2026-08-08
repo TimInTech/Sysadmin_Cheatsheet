@@ -172,4 +172,3 @@ journalctl -b -p err --no-pager
 rpm-ostree status -v
 df -hT
 ```
-
