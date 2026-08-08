@@ -144,8 +144,13 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[05 Config-Test, Reload und Rollback](07_Webserver_Reverse_Proxy_TLS/05_Config_Test_Reload_Rollback.md)**
   Syntax-Prüfung, sicherer Reload und Rollback bei Fehlkonfiguration.
 
+### 🎮 08. Bazzite
+- **[Bazzite Sysadmin Cheatsheet](08_Bazzite/README.md)**
+  Umfangreiche Bazzite-Administration für Atomic Updates, Deployments, Rollbacks, Rebase, Flatpak, Distrobox, Podman, Firewall, Storage, Backups, Gaming und Troubleshooting.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
 
 > **Hinweis:** Alle Dateien sind im Markdown-Format verfasst und optimiert für die Suche. Nutze die Suchfunktion (Strg+F / Cmd+F) in der jeweiligen Datei, um den passenden Befehl schnell zu finden.
+
