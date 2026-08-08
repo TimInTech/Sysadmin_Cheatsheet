@@ -69,4 +69,3 @@ systemctl --failed
 df -hT
 journalctl -b -p warning --no-pager
 ```
-
