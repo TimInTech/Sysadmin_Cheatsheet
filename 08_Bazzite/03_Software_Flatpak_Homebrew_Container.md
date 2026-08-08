@@ -243,4 +243,3 @@ systemctl --user daemon-reload
 ```
 
 > **TIPP:** Container standardmäßig rootless, Ports nur an benötigte Interfaces binden, Secrets über Podman-Secrets statt in Quadlet-/Compose-Dateien verwalten und Images mit vertrauenswürdigem Registry-Pfad verwenden.
-
