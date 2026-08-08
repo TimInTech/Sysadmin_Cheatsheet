@@ -247,4 +247,3 @@ journalctl -b -1 -k --no-pager
 ```
 
 > **WARNUNG:** Kein generisches `grub-install`, `grub2-mkconfig`, `dracut -f`, `ostree admin cleanup` oder Dateisystem-Repair ungeprüft aus klassischen Fedora-Anleitungen übernehmen. Bazzite nutzt image- und variantenabhängige Bootpfade.
-
