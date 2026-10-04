@@ -1,112 +1,97 @@
 # 10 Freeze- und Absturzdiagnose
 
-Diese Seite enthält die Erstdiagnose für Fedora-basierte Systeme (Fedora Workstation, Nobara, Bazzite), die einfrieren, unerwartet neu starten oder deren Oberfläche abstürzt.
+Diese Seite ist eine Schritt-für-Schritt-Anleitung für Fedora-basierte Systeme (Fedora Workstation, Nobara, Bazzite), die einfrieren, von selbst neu starten oder bei denen die Oberfläche abstürzt.
 
-> **Wichtig:** Alle Befehle auf dieser Seite sind rein lesend. Es werden keine Kernelargumente, Treiber, Energieprofile oder Deployments verändert. Erst auswerten, dann gezielt und reversibel eingreifen.
+Sie ist zum Weitergeben gedacht und setzt kein Vorwissen voraus: **ein Befehl nach dem anderen, kopieren und einfügen**. Abschnitt 1 bis 10 ist zum Ausführen, Abschnitt 11 ist für die Person, die bei der Auswertung hilft.
 
-## 1. Fehlerbild zuerst eingrenzen
+> **Alle Befehle lesen nur aus.** Es wird nichts installiert, nichts gelöscht und nichts an Treibern, Kernel oder Einstellungen geändert.
 
-Vor der Logauswertung klären, wie der Rechner tatsächlich ausgestiegen ist. Davon hängt ab, welcher Boot und welcher Logbereich relevant ist.
+## 1. Terminal öffnen
 
-| Beobachtung | Wahrscheinlicher Bereich | Erste Prüfung |
-|---|---|---|
-| Kompletter Freeze: keine Reaktion auf Tastatur, kein Ping, kein SSH | Kernel, GPU-Treiber, Datenträger-I/O, thermische Abschaltung | `journalctl -b -1`, Kernellog, `coredumpctl` |
-| Spontaner Neustart ohne Vorwarnung | Netzteil/Akku, thermische Notabschaltung, Kernel-Panic, Watchdog | `journalctl -b -1`, Kerneleinträge, `pstore` |
-| Nur die Oberfläche hängt, SSH antwortet weiter | GPU-Treiber, Wayland-Session, einzelne Anwendung | User-Journal, `coredumpctl`, GPU-Kernellog |
-| Hänger nur unter Last | Netzteil, Kühlung, RAM, SSD/NVMe | Temperaturen, SMART, Speicherdiagnose |
-| Hänger nach einem Update | Regression im neuen Deployment oder Kernel | `rpm-ostree status -v`, vorheriger Boot |
+1. Auf der Tastatur `Strg` + `Alt` + `T` drücken (englische Tastatur: `Ctrl` + `Alt` + `T`). Damit öffnet sich das Terminal.
+2. Klappt das nicht: Anwendungsmenü öffnen und nach `Terminal` oder `Konsole` suchen.
+3. Kopieren im Terminal mit `Strg` + `Umschalt` + `C`, einfügen mit `Strg` + `Umschalt` + `V`.
 
-## 2. Letzte Systemstarts anzeigen
+Für jeden Befehl auf dieser Seite gilt:
+
+| Regel | Warum |
+|---|---|
+| Immer nur **einen** Befehl kopieren | Mehrere auf einmal erzeugen Fehler, die niemand zuordnen kann |
+| Nach dem Einfügen `Enter` drücken und warten | Manche Befehle brauchen ein paar Sekunden |
+| Passwort-Eingabe bleibt leer | Das Terminal zeigt keine Passwörter an. Einfach tippen und `Enter` drücken |
+| Bei stockender Ausgabe nicht mehrfach `Enter` drücken | Nur warten, sonst kommen Befehle doppelt an |
+| Nichts selbst reparieren | Erst Ergebnisse zurückschicken, dann wird entschieden |
+
+## 2. Was ist überhaupt passiert?
+
+Dieser Abschnitt ist nur zum Notieren, hier ist kein Befehl nötig. Die Antwort hilft später bei der Auswertung.
+
+| Beobachtung | Was das meistens bedeutet |
+|---|---|
+| Nichts reagiert mehr, kein Bildwechsel, kein Mauszeiger | Kompletter Freeze des ganzen Systems |
+| Der Rechner startet von selbst neu | Absturz oder Notabschaltung |
+| Das Bild steht, aber man kommt mit `Strg` + `Alt` + `F3` in ein Text-Terminal | Problem in der Oberfläche oder im Grafiktreiber |
+| Es passiert nur in Spielen, Videos oder beim Kopieren großer Dateien | Belastung, Kühlung, Netzteil oder Datenträger |
+
+## 3. Liste der letzten Systemstarts
 
 ```bash
 journalctl --list-boots
 ```
 
-Die Ausgabe listet jeden Boot mit Index, Boot-ID und Zeitfenster.
+Die Ausgabe ist eine Liste von Starts. Wichtig ist die erste Spalte:
 
-| Angabe | Bedeutung |
+| Eintrag | Bedeutung |
 |---|---|
-| `0` | Aktuell laufender Boot |
-| `-1` | Vorheriger Boot, also der abgestürzte Start |
-| `-2`, `-3` … | Ältere Starts, nützlich für wiederkehrende Fehler |
+| `0` | Der Start, der gerade läuft |
+| `-1` | Der Start davor, also der abgestürzte |
+| `-2`, `-3` … | Noch ältere Starts |
 
-Faustregel: Nach einem Freeze mit anschließendem Neustart ist `-1` der interessante Boot. Bei einem Hänger ohne Neustart ist `0` relevant.
-
-## 3. Fehler des vorherigen Starts anzeigen
+## 4. Fehler vom abgestürzten Start anzeigen
 
 ```bash
 sudo journalctl -b -1 -p warning..alert --no-pager
 ```
 
-Diese Ausgabe ist der wichtigste Einzelbefehl, wenn der Rechner nach dem Absturz neu gestartet wurde. Sie zeigt Warnungen bis zu schweren Fehlern des vorherigen Boots.
+Das ist der wichtigste Befehl, wenn der Rechner nach dem Absturz neu gestartet wurde. Er zeigt Warnungen und Fehler des Starts davor.
 
-Ergänzend für den laufenden Boot:
+Wenn der Rechner **nicht** neu gestartet wurde, sondern gerade hängt oder läuft, stattdessen den laufenden Start anzeigen:
 
 ```bash
 sudo journalctl -b -p warning..alert --no-pager
 ```
 
-Auf Bazzite und anderen Fedora-Atomic-Systemen zusätzlich den Deployment-Stand prüfen. So lässt sich ein Hänger nach einem Update von einem Hardwareproblem trennen:
+Die Ausgabe darf lang sein. Sie muss nicht gelesen oder verstanden werden, sie wird am Ende zurückgeschickt.
 
-```bash
-rpm-ostree status -v
-```
-
-> **Hinweis:** Nach einem Freeze mit hartem Ausschalten kann der letzte Journalblock unvollständig sein, weil Journald die letzten Sekunden nicht mehr schreiben konnte. Fehlende Einträge sind kein Beweis für einen fehlerfreien Verlauf.
-
-## 4. Gezielt nach Absturzursachen suchen
-
-Im vorherigen Boot im Kernellog nach typischen Auslösern filtern:
+## 5. Nach bekannten Fehlerwörtern suchen
 
 ```bash
 sudo journalctl -b -1 -k --no-pager | grep -Ei 'error|fail|fault|panic|oops|watchdog|hang|lockup|segfault|amdgpu|nvidia|nouveau|i915|gpu|nvme|ata|i/o|thermal|overheat|mce|hardware error'
 ```
 
-Bedeutung der wichtigsten Treffer:
+Der Teil in Anführungszeichen ist eine Suchliste. Es müssen nicht alle Wörter verstanden werden. Diese Tabelle erklärt, was ein Treffer bedeutet:
 
-| Treffer | Bedeutet | Typischer Verdacht |
-|---|---|---|
-| `panic`, `oops`, `BUG:` | Kernel bricht ab | Kernel-/Treiberregression |
-| `watchdog`, `lockup`, `hang` | Kernel- oder CPU-Hänger, Soft-/Hard-Lockup | Treiber, Firmware, Energieverwaltung |
-| `amdgpu`, `i915`, `nouveau`, `nvidia`, `drm` | Grafiktreiber-Meldungen | GPU-Treiber oder GPU-Defekt |
-| `nvme`, `ata`, `i/o error`, `timeout` | Datenträger antwortet nicht | SSD/NVMe, Controller, Kabel |
-| `thermal`, `overheat` | Temperaturgrenze erreicht | Kühlung, Lüfter, Staub |
-| `mce`, `hardware error`, `EDAC` | Hardwarefehler der CPU oder des Speichers | RAM, CPU, Mainboard |
-| `segfault` | Anwendungsabsturz | Einzelnes Programm, nicht das System |
+| Gefundenes Wort | Bedeutet |
+|---|---|
+| `panic`, `oops` | Der Kernel selbst ist abgestürzt |
+| `watchdog`, `lockup`, `hang` | Das System hat sich aufgehängt und ist eingefroren |
+| `amdgpu`, `i915`, `nouveau`, `nvidia`, `drm` | Meldung vom Grafiktreiber |
+| `nvme`, `ata`, `i/o error`, `timeout` | Der Datenträger hat nicht geantwortet |
+| `thermal`, `overheat` | Temperaturproblem, Kühlung oder Lüfter |
+| `mce`, `hardware error`, `EDAC` | Hardwarefehler, zum Beispiel Arbeitsspeicher |
+| `segfault` | Ein einzelnes Programm ist abgestürzt, nicht das System |
 
-Zusätzlich die Fehlerstufen getrennt ansehen:
-
-```bash
-sudo journalctl -b -1 -k -p err --no-pager
-sudo journalctl -b -1 -p err -o short-precise --no-pager
-```
-
-Der Kernel-Ringpuffer mit `dmesg` zeigt immer nur den aktuell laufenden Boot:
-
-```bash
-sudo dmesg --level=err,warn --time-format=iso
-```
-
-## 5. Core-Dumps prüfen
-
-Abgestürzte Anwendungen und Sitzungskomponenten legen Core-Dumps ab:
+## 6. Abgestürzte Programme prüfen
 
 ```bash
 coredumpctl list --no-pager
-coredumpctl info PID --no-pager
 ```
 
-Die PID stammt aus der Liste. Ein Core-Dump erklärt den Absturz einer Anwendung oder der Sitzung, aber keinen Kernel-Freeze. Ein leeres Ergebnis schließt einen Hardware- oder Kerneldefekt nicht aus.
+Das zeigt Programme, die abgestürzt sind und einen Bericht hinterlassen haben. Bleibt die Ausgabe leer, ist das kein Fehler und kein Beweis für ein gesundes System.
 
-Deaktivierte Core-Dumps prüfen:
+## 7. Angaben zum Rechner
 
-```bash
-coredumpctl --no-pager status
-```
-
-## 6. Hardware- und Systembasis erfassen
-
-Diese Angaben gehören zu jeder Fehlermeldung dazu:
+Hier ist es in Ordnung, alles auf einmal einzufügen. Die Befehle sind nur Ansagen und ändern nichts.
 
 ```bash
 echo "=== SYSTEM ==="
@@ -117,66 +102,110 @@ echo "=== KERNEL ==="
 uname -a
 
 echo
-echo "=== GPU ==="
+echo "=== GRAFIK ==="
 lspci -nnk | grep -A4 -Ei 'VGA|3D|Display'
 
 echo
-echo "=== CPU ==="
+echo "=== PROZESSOR ==="
 lscpu | grep -E 'Model name|Vendor ID'
 
 echo
-echo "=== RAM ==="
+echo "=== ARBEITSSPEICHER ==="
 free -h
 ```
 
-Ergänzend bei Fedora-Atomic-Systemen:
+Nur auf Bazzite und anderen Fedora-Atomic-Systemen. Dort ist der Befehl optional:
 
 ```bash
 rpm-ostree status -v
-systemctl --failed
-df -hT
 ```
 
-## 7. Auswertung und nächste Schritte
+## 8. Alles in eine Datei speichern
 
-1. Wenn der Rechner nach dem Absturz neu gestartet wurde, zuerst die Schritte 2 und 3 abarbeiten. Sie enthalten die entscheidenden Hinweise.
-2. Auffällige Treffer aus Schritt 4 zeitlich mit dem letzten bekannten Aktivitätszeitpunkt vergleichen.
-3. Core-Dumps aus Schritt 5 nur dann als Ursache werten, wenn sie zum Fehlerbild passen.
-4. Die Auswertung abschließen, **bevor** Treiber, Kernelversionen, Energieverwaltung oder Kernelparameter geändert werden.
+Jetzt dieselben Befehle noch einmal, diesmal landen die Ausgaben in einer Datei. Zeile für Zeile kopieren, einfügen, `Enter` drücken, warten.
 
-Dem Fehlerbild zugeordnete Anschlussdiagnose:
+```bash
+journalctl --list-boots 2>&1 | tee ~/freeze-diagnose.txt
+```
+
+```bash
+sudo journalctl -b -1 -p warning..alert --no-pager 2>&1 | tee -a ~/freeze-diagnose.txt
+```
+
+```bash
+sudo journalctl -b -1 -k --no-pager 2>&1 | tee -a ~/freeze-diagnose.txt
+```
+
+```bash
+coredumpctl list --no-pager 2>&1 | tee -a ~/freeze-diagnose.txt
+```
+
+```bash
+cat /etc/os-release | tee -a ~/freeze-diagnose.txt
+```
+
+```bash
+uname -a | tee -a ~/freeze-diagnose.txt
+```
+
+```bash
+lscpu | grep -E 'Model name|Vendor ID' | tee -a ~/freeze-diagnose.txt
+```
+
+```bash
+free -h | tee -a ~/freeze-diagnose.txt
+```
+
+Das `tee` schreibt die Ausgabe in die Datei und zeigt sie gleichzeitig an. `tee -a` hängt an und löscht nichts. Das `2>&1` sorgt dafür, dass auch Fehlermeldungen in der Datei landen.
+
+## 9. Datei zurückschicken
+
+1. Dateimanager öffnen (bei Bazzite und Nobara heißt er `Dolphin` oder `Dateien`).
+2. In den **Persönlichen Ordner** gehen. Das ist der Zuhause-Ordner, oft mit einem Häuschen-Symbol.
+3. Darin liegt jetzt `freeze-diagnose.txt`.
+4. Diese eine Datei über Chat, Messenger oder Mail zurückschicken. Wenn sie zu groß ist: `Rechtsklick` → `Komprimieren` und die Archivdatei schicken.
+
+Fertig. Damit ist die Auswertung möglich, ohne dass jemand auf den Rechner zugreifen muss.
+
+## 10. Was du auf keinen Fall machen sollst
+
+- Nichts neu installieren und das System nicht neu aufsetzen.
+- Keine Befehle aus Foren, Videos oder Suchmaschinen ausführen, auch wenn sie passend klingen.
+- `sudo dnf install`, `sudo dnf remove` und `sudo apt install` nicht verwenden. Sie lösen ein Freeze-Problem nicht.
+- Kernel, Treiber, GRUB und Energie-Einstellungen nicht ändern.
+- `freeze-diagnose.txt` nicht löschen und den Rechner bis zur Auswertung möglichst nicht weiter belasten.
+- Festplatten nicht selbst prüfen, formatieren oder Partitionen ändern.
+
+## 11. Für die auswertende Person
+
+Diese Befehle gehören zur Auswertung und nicht in die Anleitung für den Anwender.
+
+```bash
+sudo journalctl -b -1 -p err -o short-precise --no-pager
+sudo journalctl -b -1 -k -p err --no-pager
+sudo dmesg --level=err,warn --time-format=iso
+coredumpctl info PID --no-pager
+coredumpctl --no-pager status
+systemctl --failed
+df -hT
+sudo smartctl -x /dev/nvme0
+sensors
+```
+
+Zuordnung von Befund zu nächstem Schritt:
 
 | Befund | Nächster Schritt |
 |---|---|
-| GPU-Treibermeldungen, Blackscreen | Anderes Deployment booten, Kernelversion vergleichen, Treiberstand prüfen |
-| Datenträger-Timeouts, I/O-Fehler | Laufwerksgesundheit prüfen, siehe [04 SMART und Festplattendiagnose](../03_Datenrettung_und_Forensik/04_SMART_und_Festplattendiagnose.md) |
-| Temperatur- oder Lastabhängigkeit | Kühlung und Netzteil prüfen, Lastprofile beobachten |
-| Hardwarefehler (`mce`, `EDAC`) | RAM und CPU separat testen, kein Softwareeingriff |
-| Absturz nur nach einem Update | Vorheriges Deployment booten, siehe [02 Updates, Deployments, Rebase, Recovery](02_Updates_Deployments_Rebase_Recovery.md) |
+| Grafiktreiber-Meldungen, schwarzer Bildschirm | Kernelversion vergleichen, anderes Deployment booten, Treiberstand prüfen |
+| Datenträger-Timeouts, I/O-Fehler | Laufwerksgesundheit auswerten, keine Schreibreparatur auf verdächtigen Datenträgern |
+| Temperatur- oder lastabhängig | Kühlung und Netzteil prüfen, Lastprofile beobachten |
+| `mce`, `EDAC`, Hardwarefehler | Arbeitsspeicher und Prozessor separat testen, kein Softwareeingriff |
+| Erst nach einem Update | Vorheriges Deployment booten (`rpm-ostree status -v`, Auswahl im GRUB-Menü, alternativ `sudo rpm-ostree rollback`) |
+| Nur eine Anwendung betroffen | Anwendungsproblem, Core-Dump auswerten, System unangetastet lassen |
 
-## 8. Diagnoseausgabe sichern
+Grundsatz: erst auswerten, dann eingreifen. Jeder Eingriff am Gerät braucht vorher einen Rückweg, also ein Backup oder ein bootfähiges vorheriges Deployment.
 
-Vor jedem Eingriff die Logs in eine Datei schreiben, damit die Beweislage erhalten bleibt und ein späterer Vergleich möglich ist:
-
-```bash
-{
-  journalctl --list-boots
-  sudo journalctl -b -1 -p warning..alert --no-pager
-  sudo journalctl -b -1 -k --no-pager
-  coredumpctl list --no-pager
-  rpm-ostree status -v
-  uname -a
-} | tee ~/freeze-diagnose-$(date +%F).log
-```
-
-## 9. Was hier bewusst nicht gemacht wird
-
-- Keine Änderung an Treibern, Kernelparametern, Energieverwaltung, GRUB oder Layern, solange die Logs nicht ausgewertet sind.
-- Keine Kernelversion und kein Deployment wechseln, nur weil ein Verdacht besteht.
-- Kein Löschen oder Rotieren von Journal und Core-Dumps vor der Sicherung der Ausgabe.
-- Keine Befehle aus fremden Anleitungen ungeprüft übernehmen. Auf Fedora-Atomic-Systemen gilt weiterhin der Hinweis aus dem [Bazzite-Einstieg](README.md): `sudo apt install` und `sudo dnf install` verändern das laufende System nicht dauerhaft.
-
-## 10. Weiterführende Quellen
+## 12. Weiterführende Quellen
 
 - [systemd: journalctl](https://www.freedesktop.org/software/systemd/man/latest/journalctl.html) – Bootauswahl, Prioritätsfilter und Ausgabeformate.
 - [systemd: coredumpctl](https://www.freedesktop.org/software/systemd/man/latest/coredumpctl.html) – Core-Dumps auflisten und auswerten.
