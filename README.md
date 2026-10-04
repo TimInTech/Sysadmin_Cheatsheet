@@ -147,6 +147,8 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 ### 🎮 08. Bazzite
 - **[Bazzite Sysadmin Cheatsheet](08_Bazzite/README.md)**
   Umfangreiche Bazzite-Administration für Atomic Updates, Deployments, Rollbacks, Rebase, Flatpak, Distrobox, Podman, Firewall, Storage, Backups, Gaming und Troubleshooting.
+- **[10 Freeze- und Absturzdiagnose](08_Bazzite/10_Freeze_und_Absturzdiagnose.md)**
+  Fedora, Nobara und Bazzite bei Freeze, spontanem Neustart oder Oberflächenabsturz: Boots vergleichen, Journal und Core-Dumps auswerten, Hardwarebasis dokumentieren.
 
 ---
 

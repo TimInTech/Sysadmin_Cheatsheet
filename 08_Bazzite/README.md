@@ -231,6 +231,8 @@ Persönliche Dateien und Spielstände werden dadurch nicht zurückgesetzt.
 2. Drücke einmal `Strg` + `Alt` + `Entf` und warte.
 3. Halte den Power-Knopf nur als letzten Ausweg gedrückt. Dabei können ungespeicherte Daten verloren gehen.
 
+Wenn der Rechner häufiger komplett einfriert, spontan neu startet oder die Oberfläche abstürzt: [10 Freeze- und Absturzdiagnose](10_Freeze_und_Absturzdiagnose.md).
+
 ## Nicht benutzen
 
 Diese Befehle passen nicht zu normalen Installationen auf Bazzite:
