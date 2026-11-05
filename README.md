@@ -35,6 +35,8 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   BitLocker-Status, TPM-Pruefung, Recovery-Key-Absicherung und Wartungsfenster.
 - **[10 PowerShell-Diagnose](01_Windows_11/10_PowerShell_Diagnose.md)**
   Systeminfo, Event-Logs, Dienste, Tasks, Netzwerkdiagnose, BitLocker und Defender per PowerShell.
+- **[11 OpenSSH-Server und Ubuntu-Zugriff](01_Windows_11/11_OpenSSH_Server_Ubuntu_Zugriff.md)**
+  OpenSSH unter Windows 10/11 einrichten, LAN-Firewall prüfen, von Ubuntu verbinden sowie SSH/SCP/SFTP diagnostizieren.
 
 ### 🐧 02. Linux (Kubuntu / Debian-Basis)
 - **[01 Update und Bereinigung](02_Linux/01_Update_und_Bereinigung.md)**
