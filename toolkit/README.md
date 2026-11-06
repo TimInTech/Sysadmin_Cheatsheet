@@ -11,11 +11,11 @@ Mit diesem Paket kann sich eine zweite Person über das **eigene Heimnetz** auf 
 
 ## 1. Herunterladen
 
-1. **[Hier klicken: ZIP-Datei herunterladen](https://github.com/TimInTech/Sysadmin_Cheatsheet/archive/refs/heads/main.zip)**. Der Download startet sofort, es öffnet sich keine Webseite.
-2. Die Datei `Sysadmin_Cheatsheet-main.zip` im Ordner *Downloads* mit Rechtsklick → *Alle extrahieren* entpacken.
-3. Öffne im entpackten Ordner `Sysadmin_Cheatsheet-main`: `toolkit`, danach `windows` (Windows) oder `linux` (Ubuntu/Debian).
+1. **[Hier klicken: SSH-Toolkit.zip herunterladen](https://github.com/TimInTech/Sysadmin_Cheatsheet/releases/latest/download/SSH-Toolkit.zip)**. Der Download startet sofort (ca. 19 KB), es öffnet sich keine Webseite.
+2. Die Datei `SSH-Toolkit.zip` im Ordner *Downloads* mit Rechtsklick → *Alle extrahieren* entpacken.
+3. Öffne im entpackten Ordner `SSH-Toolkit`: `windows` (Windows) oder `linux` (Ubuntu/Debian).
 
-Die ZIP-Datei enthält das ganze Sammelwerk. Für den Zugang wird nur der Ordner `toolkit` gebraucht, der Rest darf ignoriert werden.
+Diese ZIP-Datei enthält nur das Toolkit. Wer die ganze Sammlung will: [komplettes Repository als ZIP](https://github.com/TimInTech/Sysadmin_Cheatsheet/archive/refs/heads/main.zip). Dort liegt das Toolkit im Ordner `toolkit`.
 
 Du brauchst den **ganzen** Ordner `windows` beziehungsweise `linux`, nicht nur eine einzelne Datei.
 
@@ -48,7 +48,7 @@ Beim ersten Start lädt Windows eventuell die SSH-Komponente nach. Dafür muss d
 Auf dem zweiten Computer ein Terminal (Linux) oder die PowerShell (Windows) öffnen und die angezeigte Zeile eingeben, zum Beispiel:
 
 ```text
-ssh -p 22 remotehelp@192.168.178.50
+ssh -p 22 remotehelp@IP-ADRESSE
 ```
 
 Dann das Passwort eingeben. Beim Tippen erscheint **nichts** auf dem Bildschirm, das ist normal. Beim allerersten Verbinden fragt SSH, ob man dem Computer vertraut: Mit `yes` bestätigen, wenn die Verbindung wirklich zu deinem Computer gehört.
