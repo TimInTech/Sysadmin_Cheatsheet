@@ -2,7 +2,7 @@
 
 Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administration, Wartung und Datenrettung von Linux- und Windows-Systemen.
 
-**Schnellzugriff:** Das [SSH- und Diagnosepaket mit Downloadanleitung](toolkit/README.md) unterstützt Windows 10/11 und Ubuntu/Debian.
+**Schnellzugriff:** [SSH-Zugang einrichten](toolkit/README.md) für Windows 10/11 und Ubuntu/Debian · [ZIP direkt herunterladen](https://github.com/TimInTech/Sysadmin_Cheatsheet/archive/refs/heads/main.zip) · [Freie KI ohne Konto](09_KI_CLI_Slash-Befehle/00_Freie_KI_ohne_Konto.md)
 
 > [!IMPORTANT]
 > **Windows neu installiert? Als Erstes alle Updates und Treiber holen:** [Windows komplett aktualisieren (ein Durchlauf, wenige Neustarts)](01_Windows_11/01_Update_und_Upgrade.md#1-nach-der-neuinstallation-alles-in-einem-durchlauf). Installationsmedien, Rufus, ISO-Dateien und Rettungswerkzeuge: [Download-Links](04_Rettungsmedien_und_Live_Systeme/04_Download_Links.md).
@@ -166,6 +166,8 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Schritt-für-Schritt-Anleitung zum Weitergeben: Fedora, Nobara und Bazzite bei Freeze, spontanem Neustart oder Oberflächenabsturz, ein Befehl nach dem anderen, Ergebnisse als Datei zurückschicken.
 
 ### 🤖 09. KI-CLI Slash-Befehle
+- **[Freie KI ohne Konto](09_KI_CLI_Slash-Befehle/00_Freie_KI_ohne_Konto.md)**
+  Chat-Dienste im Browser und Terminal ohne Anmeldung sowie lokale Modelle, zur schnellen Prüfung von Befehlen.
 - **[Claude Code](09_KI_CLI_Slash-Befehle/Claude%20Code%20Slash-Befehle.md)**
   Slash-Befehle, Tasten und Terminal-Unterbefehle.
 - **[Codex CLI](09_KI_CLI_Slash-Befehle/Codex%20CLI%20Slash-Befehle.md)**
@@ -176,6 +178,18 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Slash-Befehle, Tasten und Startoptionen von `agy`.
 - **[ChatGPT-Promptvorlagen](09_KI_CLI_Slash-Befehle/ChatGPT%20Slash-Promptvorlagen.md)**
   96 technische Promptvorlagen für Linux, Windows, Netzwerk, Homelab, Git, Code und IT-Sicherheit.
+
+### 📱 10. Android
+- **[01 adb und scrcpy](10_Android/01_adb_und_scrcpy.md)**
+  adb einrichten, Handy-Bildschirm per Kabel und WLAN am Computer (scrcpy), Dateien, Apps, Backup, Logcat und Wiederherstellung.
+
+### 🧰 11. Ersteinrichtung
+- **[01 Checkliste Windows und Ubuntu](11_Ersteinrichtung/01_Checkliste_Windows_und_Ubuntu.md)**
+  Feste Reihenfolge nach der Neuinstallation: Updates, Treiber, Sicherheit, Programme, Backup. Dazu die winget-Paketliste [programme.winget.json](11_Ersteinrichtung/programme.winget.json) zum Importieren.
+
+### 🗄️ 12. NAS und Netzwerkfreigaben
+- **[01 SMB, NFS, Synology und Tools vom NAS](12_NAS_und_Netzwerkfreigaben/01_SMB_NFS_Synology_und_Tools_vom_NAS.md)**
+  Freigaben unter Windows und Linux verbinden, fstab ohne Boot-Hänger, Synology einrichten und portable Werkzeuge vom NAS nutzen.
 
 ### 🌐 13. Remotezugriff
 - **[01 RDP, VNC, Tailscale, WireGuard und Wake-on-LAN](13_Remotezugriff/01_RDP_VNC_Tailscale_WireGuard_und_WoL.md)**
