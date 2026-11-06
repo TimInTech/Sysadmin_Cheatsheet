@@ -92,7 +92,25 @@ port=22222
 if ss -H -ltn "sport = :$port" | grep -q .; then echo "Port $port ist bereits belegt." >&2; exit 1; fi
 # Reserve identity metadata before account creation; a random GECOS marker prevents deletion of replacements.
 marker=$(python3 -c 'import secrets; print(secrets.token_hex(16))')
-uid=$(python3 -c 'import pwd; used={p.pw_uid for p in pwd.getpwall()}; print(next(i for i in range(2000,60000) if i not in used))')
+uid=$(python3 - <<'PYUID'
+import pathlib, pwd
+used = {p.pw_uid for p in pwd.getpwall()}
+for proc in pathlib.Path('/proc').iterdir():
+    if not proc.name.isdigit():
+        continue
+    try:
+        lines = (proc / 'status').read_text().splitlines()
+    except FileNotFoundError:
+        continue
+    uid_line = next((line for line in lines if line.startswith('Uid:')), None)
+    if uid_line is None:
+        raise RuntimeError('Process UID unavailable')
+    used.update(map(int, uid_line.split()[1:]))
+print(next(i for i in range(2000, 60000) if i not in used))
+PYUID
+)
+scriptdir=$(dirname "$(readlink -f "$0")")
+"$scriptdir/UID_GUARD.sh" --available "$uid" "$username" || { echo 'UID-Sicherheit nicht nachweisbar; Einrichtung abgebrochen.' >&2; exit 1; }
 expiry=$(($(date +%s)+7200))
 mkdir -m 700 "$state" "$runtime"
 trap 'PORTABLE_SSH_LOCK_HELD=1 "$state/stop.sh" --rollback || true' ERR
@@ -101,6 +119,9 @@ cp "$(dirname "$(readlink -f "$0")")/STOP_HIER.sh" "$state/stop.sh"
 chmod 700 "$state/stop.sh"
 cp "$(dirname "$(readlink -f "$0")")/DEADLINE.sh" "$state/deadline.sh"
 chmod 700 "$state/deadline.sh"
+cp "$scriptdir/UID_GUARD.sh" "$state/uid-guard.sh"
+cp "$scriptdir/TERMINATE_USER.sh" "$state/terminate-user.sh"
+chmod 700 "$state/uid-guard.sh" "$state/terminate-user.sh"
 printf '%s\n' "$username" > "$state/user"
 printf '%s\n' "$uid" > "$state/uid"
 printf '%s\n' "$marker" > "$state/marker"
@@ -117,17 +138,26 @@ cat > "$unit/portable-sysadmin-stop.service" <<SERVICE
 # portable-sysadmin $marker
 [Unit]
 Description=Immediately revoke expired Portable Sysadmin SSH access
+StartLimitIntervalSec=0
 [Service]
 Type=oneshot
+ExecCondition=/usr/bin/test -x $state/deadline.sh
 ExecStart=$state/deadline.sh
+Restart=on-failure
+RestartSec=5s
 SERVICE
 cat > "$unit/portable-sysadmin-cleanup.service" <<SERVICE
 # portable-sysadmin $marker
 [Unit]
 Description=Remove expired Portable Sysadmin SSH resources
+After=portable-sysadmin-stop.service
+StartLimitIntervalSec=0
 [Service]
 Type=oneshot
 ExecStart=$state/stop.sh --timer
+TimeoutStartSec=30s
+Restart=on-failure
+RestartSec=5s
 SERVICE
 cat > "$unit/portable-sysadmin-stop.timer" <<TIMER
 # portable-sysadmin $marker
@@ -156,6 +186,9 @@ systemctl enable --now portable-sysadmin-stop.timer >/dev/null
 systemctl enable portable-sysadmin-boot-cleanup.service >/dev/null
 # The real account remains password-locked, so other daemons cannot use this password.
 useradd -M -N -g nogroup -u "$uid" -c "portable-sysadmin-$marker" -d /nonexistent -s /bin/bash "$username"
+"$state/uid-guard.sh" --owned "$uid" "$username" || { echo 'UID-Sicherheit nicht nachweisbar.' >&2; false; }
+"$state/uid-guard.sh" --no-processes "$uid" "$username" || { echo 'Fremde Prozesse mit dieser UID vorhanden.' >&2; false; }
+printf '%s\n' "$marker" > "$state/processes-armed"
 password=$(python3 -c 'import secrets,string; print("".join(secrets.choice(string.ascii_letters+string.digits) for _ in range(20)))')
 hash=$(printf '%s\n' "$password" | openssl passwd -6 -stdin)
 printf '%s:%s:20000:0:99999:7:::\n' "$username" "$hash" > "$runtime/shadow"

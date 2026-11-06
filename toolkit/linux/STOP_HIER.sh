@@ -25,38 +25,48 @@ for name in portable-sysadmin-ssh.service portable-sysadmin-stop.service portabl
     [[ ! -L $unit/$name && $(head -n 1 "$unit/$name") == "# portable-sysadmin $marker" ]] || { echo "Fremde oder veränderte Unit $name bleibt erhalten." >&2; exit 1; }
   fi
 done
-if entry=$(getent passwd "$username"); then
+entry=''; getent_rc=0
+entry=$(getent passwd "$username") || getent_rc=$?
+if ((getent_rc == 0)); then
   IFS=: read -r existing _ current_uid _ gecos _ _ <<< "$entry"
   [[ $existing == "$username" && $current_uid == "$uid" && $gecos == "portable-sysadmin-$marker" ]] || { echo 'Benutzeridentität stimmt nicht; kein Benutzer entfernt.' >&2; exit 1; }
+elif ((getent_rc != 2)) || awk -F: -v n="$username" '$1 == n {found=1} END {exit !found}' /etc/passwd; then
+  echo 'Benutzerauflösung fehlgeschlagen; Zustand bleibt erhalten.' >&2; exit 1
 fi
 if [[ -f $unit/portable-sysadmin-ssh.service ]]; then
   systemctl stop portable-sysadmin-ssh.service || { echo 'SSH-Dienst konnte nicht gestoppt werden.' >&2; exit 1; }
   if systemctl is-active --quiet portable-sysadmin-ssh.service; then echo 'SSH-Dienst läuft weiterhin.' >&2; exit 1; fi
 fi
-if [[ -f $unit/portable-sysadmin-stop.timer ]]; then systemctl disable --now portable-sysadmin-stop.timer >/dev/null; fi
-if [[ -f $unit/portable-sysadmin-boot-cleanup.service ]]; then systemctl disable portable-sysadmin-boot-cleanup.service >/dev/null; fi
-if getent passwd "$username" >/dev/null; then
-  awk -F: -v u="$uid" -v n="$username" '$3 == u {count++; if ($1 != n) bad=1} END {exit !(count==1 && !bad)}' /etc/passwd || { echo 'UID nicht eindeutig; keine Prozesse beendet.' >&2; exit 1; }
-  timeout 5 loginctl terminate-user "$uid" >/dev/null 2>&1 || true
-  pkill -KILL -u "$uid" 2>/dev/null || true
+if ((getent_rc == 0)); then
+  "$state/uid-guard.sh" --owned "$uid" "$username" || { echo 'UID nicht eindeutig; keine Prozesse beendet.' >&2; exit 1; }
   [[ ! -L $lockdir/identity ]] || { echo 'Unsicherer Identitäts-Lock.' >&2; exit 1; }
   exec 8>"$lockdir/identity"
   flock -x 8
   entry=$(getent passwd "$username") || { echo 'Konto während Rückbau verändert.' >&2; exit 1; }
   IFS=: read -r existing _ current_uid _ gecos _ _ <<< "$entry"
   [[ $existing == "$username" && $current_uid == "$uid" && $gecos == "portable-sysadmin-$marker" ]] || { echo 'Benutzeridentität geändert.' >&2; exit 1; }
+  "$state/uid-guard.sh" --owned "$uid" "$username" || { echo 'UID nicht eindeutig.' >&2; exit 1; }
+  if [[ -f $state/processes-armed && ! -L $state/processes-armed && $(cat "$state/processes-armed") == "$marker" ]]; then
+    "$state/terminate-user.sh" "$uid" || { echo 'Benutzersitzungen bestehen; Konto bleibt erhalten.' >&2; exit 1; }
+  else
+    "$state/uid-guard.sh" --no-processes "$uid" "$username" || { echo 'Fremde Prozesse mit dieser UID; Konto bleibt erhalten.' >&2; exit 1; }
+  fi
   for _ in 1 2 3 4 5; do
     if userdel "$username" 2>/dev/null; then break; fi
     sleep 1
   done
-  if getent passwd "$username" >/dev/null; then echo 'Konto konnte nicht gelöscht werden; Zustand bleibt für erneuten STOP erhalten.' >&2; exit 1; fi
+  remaining_rc=0
+  getent passwd "$username" >/dev/null || remaining_rc=$?
+  if ((remaining_rc != 2)) || awk -F: -v n="$username" '$1 == n {found=1} END {exit !found}' /etc/passwd; then echo 'Kontolöschung nicht bestätigt; Zustand bleibt erhalten.' >&2; exit 1; fi
 fi
+if [[ -f $unit/portable-sysadmin-stop.timer ]]; then systemctl disable --now portable-sysadmin-stop.timer >/dev/null; fi
+if [[ -f $unit/portable-sysadmin-boot-cleanup.service ]]; then systemctl disable portable-sysadmin-boot-cleanup.service >/dev/null; fi
 rm -f -- "$unit/portable-sysadmin-ssh.service" "$unit/portable-sysadmin-stop.service" "$unit/portable-sysadmin-cleanup.service" "$unit/portable-sysadmin-stop.timer" "$unit/portable-sysadmin-boot-cleanup.service"
 systemctl daemon-reload
 if [[ -d $runtime && ! -L $runtime ]]; then
   rm -f -- "$runtime/shadow" "$runtime/pam" "$runtime/sshd_config" "$runtime/sshd.pid"
   rmdir "$runtime" || { echo 'Zusätzliche Laufzeitdateien bleiben erhalten.' >&2; exit 1; }
 fi
-rm -f -- "$state/user" "$state/uid" "$state/marker" "$state/expiry" "$state/check-expiry.sh" "$state/deadline.sh" "$state/stop.sh"
+rm -f -- "$state/user" "$state/uid" "$state/marker" "$state/expiry" "$state/check-expiry.sh" "$state/deadline.sh" "$state/uid-guard.sh" "$state/terminate-user.sh" "$state/processes-armed" "$state/stop.sh"
 rmdir "$state" || { echo 'Zusätzliche Zustandsdateien bleiben erhalten.' >&2; exit 1; }
 echo 'Der verwaltete SSH-Zugang wurde beendet.'

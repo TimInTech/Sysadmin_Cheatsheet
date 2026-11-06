@@ -6,6 +6,8 @@ Die fünf Windows-Diagnosewerkzeuge liegen unter `windows/`. Diagnose und Repara
 
 Der Linux-Entwurf unter `linux/` richtet einen zeitlich begrenzten Zugang ein. Ein Neustart beendet ihn vorzeitig. Er ändert keine bestehende Firewall; diese kann die Verbindung blockieren. Eine dauerhafte Einrichtung und automatische Firewallöffnung fehlen. Die isolierte Authentifizierung wirkt sich innerhalb der Sitzung auf die Anmeldung als andere lokale Benutzer und auf sudo-Passwortprüfungen aus.
 
+Der Entwurf bricht bei nicht unterstützten Identitätsanbietern ab. Der geprüfte Ubuntu-GNOME-Host mit `sss` und zusätzlichen UserDB-Anbietern wird derzeit abgewiesen; die Kompatibilität mit typischen Ubuntu-Desktops ist daher nicht nachgewiesen. Die UID-Prüfung ist eine Momentaufnahme und kann eine gleichzeitige privilegierte Neuzuweisung nicht atomar ausschließen.
+
 ## Bisherige Prüfung und offene Punkte
 
 - In einer isolierten Ubuntu-26.04-VM wurden Erstinstallation, richtige und falsche Passwörter, Verweigerung am bestehenden SSH-Dienst, STOP, Neustart und beschleunigter Ablauf geprüft. Ein weiterer Test prüfte den Ablauf bei blockierter Einrichtung und offener Sitzung. Das ist kein Test von einem zweiten physischen Rechner oder auf anderen Linux-Versionen.

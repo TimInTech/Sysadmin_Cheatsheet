@@ -17,6 +17,8 @@ jobs:
         run: |
           bash toolkit/linux/tests/test-validation.sh
           bash toolkit/linux/tests/test-expiry.sh
+          bash toolkit/linux/tests/test-nss.sh
+          bash toolkit/linux/tests/test-termination.sh
   windows:
     runs-on: windows-2022
     defaults:
