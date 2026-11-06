@@ -20,6 +20,7 @@ Describe 'Windows OpenSSH password and session integration' {
             $key = Join-Path $TestDrive 'login_host_key'
             $keyError = Join-Path $TestDrive 'login-keygen.err'
             $keygen = Start-Process "$env:WINDIR\System32\OpenSSH\ssh-keygen.exe" -ArgumentList "-q -t ed25519 -N `"`" -f `"$key`"" -PassThru -NoNewWindow -RedirectStandardError $keyError
+            $null = $keygen.Handle
             if (-not $keygen.WaitForExit(15000)) { $keygen.Kill(); throw 'ssh-keygen ueberschritt sein Zeitlimit.' }
             if ($keygen.ExitCode -ne 0) { throw "Test-Hostschluessel Fehler $($keygen.ExitCode): $(Get-Content $keyError -Raw)" }
             $probe = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
@@ -41,6 +42,7 @@ Describe 'Windows OpenSSH password and session integration' {
             $err = Join-Path $TestDrive 'probe.err'
             $script = Join-Path $PSScriptRoot 'ssh_login_probe.py'
             $client = Start-Process $env:TOOLKIT_TEST_PYTHON -ArgumentList @("`"$script`"") -RedirectStandardOutput $out -RedirectStandardError $err -PassThru
+            $null = $client.Handle
             if (-not $client.WaitForExit(65000)) { $client.Kill(); throw 'SSH-Anmeldetest ueberschritt sein Zeitlimit.' }
             if ($client.ExitCode -ne 0) {
                 $message = Get-Content -LiteralPath $err -Raw

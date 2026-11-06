@@ -38,6 +38,7 @@ Describe 'Supervised process lifecycle' {
         $key = Join-Path $TestDrive 'host_ed25519'
         $keyError = Join-Path $TestDrive 'listener-keygen.err'
         $keygen = Start-Process "$env:WINDIR\System32\OpenSSH\ssh-keygen.exe" -ArgumentList "-q -t ed25519 -N `"`" -f `"$key`"" -PassThru -NoNewWindow -RedirectStandardError $keyError
+        $null = $keygen.Handle
         if (-not $keygen.WaitForExit(15000)) { $keygen.Kill(); throw 'ssh-keygen ueberschritt sein Zeitlimit.' }
         if ($keygen.ExitCode -ne 0) { throw "Test-Hostschluessel Fehler $($keygen.ExitCode): $(Get-Content $keyError -Raw)" }
         $probe = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
