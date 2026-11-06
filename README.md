@@ -195,6 +195,10 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[01 RDP, VNC, Tailscale, WireGuard und Wake-on-LAN](13_Remotezugriff/01_RDP_VNC_Tailscale_WireGuard_und_WoL.md)**
   Bildschirm-Fernzugriff, VPN ohne Portfreigabe, eigenes WireGuard-VPN und Rechner per Netzwerk einschalten.
 
+### 14. Reparatur-Spickzettel
+- **[01 Notfall-Spickzettel](14_Reparatur_Spickzettel/01_Notfall_Spickzettel.md)**
+  Windows startet nicht, GRUB reparieren, Passwort zurücksetzen, Daten von defekter Platte retten und SMART prüfen. Verweist auf die ausführlichen Seiten.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
