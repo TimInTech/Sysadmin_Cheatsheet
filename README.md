@@ -177,6 +177,10 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[ChatGPT-Promptvorlagen](09_KI_CLI_Slash-Befehle/ChatGPT%20Slash-Promptvorlagen.md)**
   96 technische Promptvorlagen für Linux, Windows, Netzwerk, Homelab, Git, Code und IT-Sicherheit.
 
+### 🗄️ 12. NAS und Netzwerkfreigaben
+- **[01 SMB, NFS, Synology und Tools vom NAS](12_NAS_und_Netzwerkfreigaben/01_SMB_NFS_Synology_und_Tools_vom_NAS.md)**
+  Freigaben unter Windows und Linux verbinden, fstab ohne Boot-Hänger, Synology einrichten und portable Werkzeuge vom NAS nutzen.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
