@@ -177,6 +177,10 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[ChatGPT-Promptvorlagen](09_KI_CLI_Slash-Befehle/ChatGPT%20Slash-Promptvorlagen.md)**
   96 technische Promptvorlagen für Linux, Windows, Netzwerk, Homelab, Git, Code und IT-Sicherheit.
 
+### 📱 10. Android
+- **[01 adb und scrcpy](10_Android/01_adb_und_scrcpy.md)**
+  adb einrichten, Handy-Bildschirm per Kabel und WLAN am Computer (scrcpy), Dateien, Apps, Backup, Logcat und Wiederherstellung.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
