@@ -22,9 +22,9 @@ while True:
     try:
         client = connect(os.environ["TOOLKIT_TEST_PASSWORD"])
         break
-    except (socket.error, paramiko.SSHException):
+    except (socket.error, paramiko.SSHException) as exc:
         if time.monotonic() >= deadline:
-            raise RuntimeError("SSH server did not accept a valid login in time") from None
+            raise RuntimeError("SSH server did not accept a valid login in time; last error type: " + type(exc).__name__) from None
         time.sleep(0.2)
 
 try:
