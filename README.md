@@ -91,6 +91,9 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Netzwerkstack erkennen (NetworkManager/systemd-networkd) und Netplan pruefen.
 - **[26 DHCP mDNS Avahi](02_Linux/26_DHCP_mDNS_Avahi.md)**
   DHCP-Leases, mDNS-Diensterkennung und Avahi-Status.
+- **[Tastaturbelegung](02_Linux/Tastaturbelegung.md)**
+- **[Ubuntu 26.04 Tastatur-Shortcuts](02_Linux/Ubuntu-26.04-Tastatur-Shortcuts.md)**
+- **[Ubuntu 26.04 Terminal und Anwendungen](02_Linux/Ubuntu-26.04-Terminal-und-Anwendungen.md)**
 
 ### 🕵️ 03. Datenrettung und Forensik
 - **[01 Klonen und Imaging](03_Datenrettung_und_Forensik/01_Klonen_und_Imaging.md)**
@@ -151,6 +154,13 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Umfangreiche Bazzite-Administration für Atomic Updates, Deployments, Rollbacks, Rebase, Flatpak, Distrobox, Podman, Firewall, Storage, Backups, Gaming und Troubleshooting.
 - **[10 Freeze- und Absturzdiagnose](08_Bazzite/10_Freeze_und_Absturzdiagnose.md)**
   Schritt-für-Schritt-Anleitung zum Weitergeben: Fedora, Nobara und Bazzite bei Freeze, spontanem Neustart oder Oberflächenabsturz, ein Befehl nach dem anderen, Ergebnisse als Datei zurückschicken.
+
+### 🤖 09. KI-CLI Slash-Befehle
+- **[Antigravity CLI Slash-Befehle](09_KI_CLI_Slash-Befehle/Antigravity%20CLI%20Slash-Befehle.md)**
+- **[ChatGPT Slash-Promptvorlagen](09_KI_CLI_Slash-Befehle/ChatGPT%20Slash-Promptvorlagen.md)**
+- **[Claude Code Slash-Befehle](09_KI_CLI_Slash-Befehle/Claude%20Code%20Slash-Befehle.md)**
+- **[Codex CLI Slash-Befehle](09_KI_CLI_Slash-Befehle/Codex%20CLI%20Slash-Befehle.md)**
+- **[Gemini CLI Slash-Befehle](09_KI_CLI_Slash-Befehle/Gemini%20CLI%20Slash-Befehle.md)**
 
 ---
 
