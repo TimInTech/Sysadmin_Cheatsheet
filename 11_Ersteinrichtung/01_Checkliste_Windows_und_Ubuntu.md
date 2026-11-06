@@ -139,7 +139,7 @@ Die Datei [programme.winget.json](programme.winget.json) in diesem Ordner enthä
 | PowerToys | Windows-Zusatzwerkzeuge |
 | Rufus | Bootfähige USB-Sticks |
 | HWiNFO, CrystalDiskInfo | Hardware- und Festplattenstatus |
-| Platform-Tools, scrcpy | Android-Handy am Computer (Android-Anleitung folgt in `10_Android`) |
+| Platform-Tools, scrcpy | Android-Handy am Computer ([Anleitung](../10_Android/01_adb_und_scrcpy.md)) |
 
 Zum Importieren (PowerShell, im Ordner der Datei oder mit vollem Pfad):
 
