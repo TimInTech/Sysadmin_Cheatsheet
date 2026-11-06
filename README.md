@@ -2,7 +2,7 @@
 
 Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administration, Wartung und Datenrettung von Linux- und Windows-Systemen.
 
-**Schnellzugriff:** Das [SSH- und Diagnosepaket mit Downloadanleitung](toolkit/README.md) unterstützt Windows 10/11 und Ubuntu/Debian.
+**Schnellzugriff:** [SSH-Zugang einrichten](toolkit/README.md) für Windows 10/11 und Ubuntu/Debian · [ZIP direkt herunterladen](https://github.com/TimInTech/Sysadmin_Cheatsheet/archive/refs/heads/main.zip) · [Freie KI ohne Konto](09_KI_CLI_Slash-Befehle/00_Freie_KI_ohne_Konto.md)
 
 > [!IMPORTANT]
 > **Windows neu installiert? Als Erstes alle Updates und Treiber holen:** [Windows komplett aktualisieren (ein Durchlauf, wenige Neustarts)](01_Windows_11/01_Update_und_Upgrade.md#1-nach-der-neuinstallation-alles-in-einem-durchlauf). Installationsmedien, Rufus, ISO-Dateien und Rettungswerkzeuge: [Download-Links](04_Rettungsmedien_und_Live_Systeme/04_Download_Links.md).
@@ -166,6 +166,8 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Schritt-für-Schritt-Anleitung zum Weitergeben: Fedora, Nobara und Bazzite bei Freeze, spontanem Neustart oder Oberflächenabsturz, ein Befehl nach dem anderen, Ergebnisse als Datei zurückschicken.
 
 ### 🤖 09. KI-CLI Slash-Befehle
+- **[Freie KI ohne Konto](09_KI_CLI_Slash-Befehle/00_Freie_KI_ohne_Konto.md)**
+  Chat-Dienste im Browser und Terminal ohne Anmeldung sowie lokale Modelle, zur schnellen Prüfung von Befehlen.
 - **[Claude Code](09_KI_CLI_Slash-Befehle/Claude%20Code%20Slash-Befehle.md)**
   Slash-Befehle, Tasten und Terminal-Unterbefehle.
 - **[Codex CLI](09_KI_CLI_Slash-Befehle/Codex%20CLI%20Slash-Befehle.md)**
