@@ -58,7 +58,7 @@ systemd-analyze critical-chain
 ## 3. Wo finde ich Fehler unter Bazzite?
 
 | Bereich | Diagnose |
-|---|---|
+| --- | --- |
 | Host/Boot | `journalctl -b -p warning`, `journalctl -b -k` |
 | Deployment | `rpm-ostree status -v`, `journalctl -u rpm-ostreed` |
 | bootc | `bootc status`, `journalctl -b -g bootc` |

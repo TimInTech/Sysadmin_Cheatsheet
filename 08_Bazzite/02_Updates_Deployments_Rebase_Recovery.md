@@ -3,7 +3,7 @@
 ## 1. Update, Upgrade, Rebase und Rollback
 
 | Begriff | Bedeutung auf Bazzite |
-|---|---|
+| --- | --- |
 | Update/Upgrade | Neues Image und zusätzliche Softwareaktualisierungen beziehen; Aktivierung des Host-Deployments beim Neustart |
 | Rebase | Auf ein anderes Bazzite-Image oder einen anderen Kanal wechseln |
 | Rollback | Vorheriges Deployment als nächsten Standardboot verwenden |

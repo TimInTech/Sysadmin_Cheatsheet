@@ -17,7 +17,7 @@ gsettings set org.gnome.desktop.wm.keybindings minimize "['<Super>h']"
 ## 1. System und Fenster
 
 | Aktion | Ubuntu (GNOME 50) | Kubuntu (Plasma) |
-|---|---|---|
+| --- | --- | --- |
 | Aktivitäten / Anwendungsübersicht | `Super` (Übersicht), `Super + A` (Anwendungen) | `Meta` (Anwendungsmenü) |
 | Fenster schließen | `Alt + F4` | `Alt + F4` |
 | Fenster minimieren | `Super + H` | `Meta + F9` |
@@ -39,7 +39,7 @@ gsettings set org.gnome.desktop.wm.keybindings minimize "['<Super>h']"
 ## 2. Screenshots
 
 | Aktion | Ubuntu (GNOME) |
-|---|---|
+| --- | --- |
 | Screenshot-Oberfläche (Bereich, Fenster, Bildschirm, Aufnahme) | `Druck` |
 | Ganzer Bildschirm sofort | `Shift + Druck` |
 | Aktuelles Fenster sofort | `Alt + Druck` |
@@ -49,7 +49,7 @@ KDE: `Druck` startet Spectacle, die Bereichsaufnahme wird in den Plasma-Einstell
 ## 3. Terminal (Bash/Readline, in jeder Umgebung)
 
 | Aktion | Shortcut |
-|---|---|
+| --- | --- |
 | Laufenden Befehl abbrechen | `Ctrl + C` |
 | Autovervollständigen | `Tab` (zweimal: Vorschläge) |
 | Vorheriger / nächster Befehl | `↑` / `↓` |
@@ -70,7 +70,7 @@ KDE: `Druck` startet Spectacle, die Bereichsaufnahme wird in den Plasma-Einstell
 ## 4. Allgemein
 
 | Aktion | Shortcut |
-|---|---|
+| --- | --- |
 | Suche im Fenster oder Text | `Ctrl + F` |
 | Hilfe | `Super + F1` |
 

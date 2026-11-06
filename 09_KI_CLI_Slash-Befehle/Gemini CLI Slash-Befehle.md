@@ -8,7 +8,7 @@ Gemini CLI 0.54.0, Stand 2026-10-22. Quelle: <https://geminicli.com/docs/referen
 ## Slash-Befehle
 
 | Befehl | Wirkung / Unterbefehle |
-|---|---|
+| --- | --- |
 | `/about` | Versionsinfo |
 | `/agents` | Subagents: `list`, `reload`, `enable <name>`, `disable <name>`, `config <name>` |
 | `/auth` | Anmeldeverfahren wechseln |

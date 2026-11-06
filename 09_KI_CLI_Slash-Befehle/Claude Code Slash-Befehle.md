@@ -8,7 +8,7 @@ Claude Code 2.1.308, Stand 2026-10-22. Quelle: <https://code.claude.com/docs/en/
 ## Sitzung und Verlauf
 
 | Befehl | Wirkung |
-|---|---|
+| --- | --- |
 | `/clear [name]` | neue Unterhaltung mit leerem Kontext |
 | `/compact [Hinweis]` | Verlauf zusammenfassen |
 | `/autocompact [auto\|Tokens]` | Schwelle für automatisches Komprimieren |
@@ -25,7 +25,7 @@ Claude Code 2.1.308, Stand 2026-10-22. Quelle: <https://code.claude.com/docs/en/
 ## Arbeiten und Prüfen
 
 | Befehl | Wirkung |
-|---|---|
+| --- | --- |
 | `/plan [Beschreibung]` | Plan-Modus |
 | `/goal [Bedingung\|clear]` | über mehrere Züge arbeiten, bis die Bedingung erfüllt ist |
 | `/diff` | Änderungen im Arbeitsbaum ansehen |
@@ -47,7 +47,7 @@ Claude Code 2.1.308, Stand 2026-10-22. Quelle: <https://code.claude.com/docs/en/
 ## Modell, Kontext, Rechte
 
 | Befehl | Wirkung |
-|---|---|
+| --- | --- |
 | `/model [Modell]` | Modell wechseln (als Standard gespeichert) |
 | `/effort [low…max\|auto\|status]` | Reasoning-Aufwand |
 | `/fast [on\|off]` | Fast-Modus |
