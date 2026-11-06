@@ -183,6 +183,10 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[01 adb und scrcpy](10_Android/01_adb_und_scrcpy.md)**
   adb einrichten, Handy-Bildschirm per Kabel und WLAN am Computer (scrcpy), Dateien, Apps, Backup, Logcat und Wiederherstellung.
 
+### 🧰 11. Ersteinrichtung
+- **[01 Checkliste Windows und Ubuntu](11_Ersteinrichtung/01_Checkliste_Windows_und_Ubuntu.md)**
+  Feste Reihenfolge nach der Neuinstallation: Updates, Treiber, Sicherheit, Programme, Backup. Dazu die winget-Paketliste [programme.winget.json](11_Ersteinrichtung/programme.winget.json) zum Importieren.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
