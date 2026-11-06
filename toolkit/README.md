@@ -11,10 +11,11 @@ Mit diesem Paket kann sich eine zweite Person über das **eigene Heimnetz** auf 
 
 ## 1. Herunterladen
 
-1. Öffne die [Seite des Projekts](https://github.com/TimInTech/Sysadmin_Cheatsheet).
-2. Klicke auf den grünen Knopf **Code** und dann auf **Download ZIP**.
-3. Entpacke die ZIP-Datei (Rechtsklick → *Alle extrahieren*).
-4. Öffne im entpackten Ordner: `toolkit`, danach `windows` (Windows) oder `linux` (Ubuntu/Debian).
+1. **[Hier klicken: ZIP-Datei herunterladen](https://github.com/TimInTech/Sysadmin_Cheatsheet/archive/refs/heads/main.zip)**. Der Download startet sofort, es öffnet sich keine Webseite.
+2. Die Datei `Sysadmin_Cheatsheet-main.zip` im Ordner *Downloads* mit Rechtsklick → *Alle extrahieren* entpacken.
+3. Öffne im entpackten Ordner `Sysadmin_Cheatsheet-main`: `toolkit`, danach `windows` (Windows) oder `linux` (Ubuntu/Debian).
+
+Die ZIP-Datei enthält das ganze Sammelwerk. Für den Zugang wird nur der Ordner `toolkit` gebraucht, der Rest darf ignoriert werden.
 
 Du brauchst den **ganzen** Ordner `windows` beziehungsweise `linux`, nicht nur eine einzelne Datei.
 
