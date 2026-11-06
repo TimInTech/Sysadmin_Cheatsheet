@@ -187,6 +187,18 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[01 Checkliste Windows und Ubuntu](11_Ersteinrichtung/01_Checkliste_Windows_und_Ubuntu.md)**
   Feste Reihenfolge nach der Neuinstallation: Updates, Treiber, Sicherheit, Programme, Backup. Dazu die winget-Paketliste [programme.winget.json](11_Ersteinrichtung/programme.winget.json) zum Importieren.
 
+### 🗄️ 12. NAS und Netzwerkfreigaben
+- **[01 SMB, NFS, Synology und Tools vom NAS](12_NAS_und_Netzwerkfreigaben/01_SMB_NFS_Synology_und_Tools_vom_NAS.md)**
+  Freigaben unter Windows und Linux verbinden, fstab ohne Boot-Hänger, Synology einrichten und portable Werkzeuge vom NAS nutzen.
+
+### 🌐 13. Remotezugriff
+- **[01 RDP, VNC, Tailscale, WireGuard und Wake-on-LAN](13_Remotezugriff/01_RDP_VNC_Tailscale_WireGuard_und_WoL.md)**
+  Bildschirm-Fernzugriff, VPN ohne Portfreigabe, eigenes WireGuard-VPN und Rechner per Netzwerk einschalten.
+
+### 14. Reparatur-Spickzettel
+- **[01 Notfall-Spickzettel](14_Reparatur_Spickzettel/01_Notfall_Spickzettel.md)**
+  Windows startet nicht, GRUB reparieren, Passwort zurücksetzen, Daten von defekter Platte retten und SMART prüfen. Verweist auf die ausführlichen Seiten.
+
 ### 15. Drucker und Scanner
 - **[01 Drucker und Scanner: CUPS und Windows](15_Drucker_und_Scanner/01_Drucker_und_Scanner_CUPS_und_Windows.md)**
   Netzwerkdrucker treiberlos einrichten, Druckaufträge steuern, hängende Warteschlange lösen, Scanner mit SANE und unter Windows.
