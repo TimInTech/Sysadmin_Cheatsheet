@@ -2,6 +2,8 @@
 
 Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administration, Wartung und Datenrettung von Linux- und Windows-Systemen.
 
+**Schnellzugriff:** Das [SSH- und Diagnosepaket mit Downloadanleitung](toolkit/README.md) unterstützt Windows 10/11 und Ubuntu/Debian.
+
 ---
 
 ## Sicherheitshinweis

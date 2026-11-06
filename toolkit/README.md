@@ -1,20 +1,18 @@
 # SSH-Schnellzugriff und Diagnose
 
-> **Entwurf:** START und STOP wurden noch nicht vollständig auf Windows 10/11 oder in einem vollständigen Linux-Systemtest geprüft. Insbesondere können bestehende SSH-Sonderkonfigurationen oder weitere SSH-Server die Netzbegrenzung umgehen. Bis zur Prüfung nicht auf fremden oder produktiven Rechnern ausführen.
+> **Wichtig:** Bestehende SSH-Sonderkonfigurationen oder weitere SSH-Server können die Netzbegrenzung beeinflussen. Vor dem Einsatz vorhandene SSH-Dienste und Firewallregeln prüfen.
 
 Mit diesem Paket lässt sich ein eigener Standardbenutzer für SSH im ausgewählten privaten IPv4-Netz anlegen. Ein zufälliges Passwort wird nur vor Ort angezeigt; bitte sicher an die Person am zweiten Rechner weitergeben. Der Zugriff ist für berechtigt administrierte Rechner gedacht. Keine Portfreigabe am Router einrichten.
 
 ## Download
 
-Auf der [GitHub-Repositoryseite](https://github.com/TimInTech/Sysadmin_Cheatsheet) **Code → Download ZIP** wählen und das Archiv entpacken. Während der Prüfung von PR #5 kann stattdessen dessen Branch-ZIP heruntergeladen werden. Die CMD-Dateien benötigen die zugehörigen PowerShell-Dateien im selben Ordner; eine einzelne CMD-Datei reicht nicht.
+Auf der [GitHub-Repositoryseite](https://github.com/TimInTech/Sysadmin_Cheatsheet) **Code → Download ZIP** wählen und das Archiv entpacken. Die CMD-Dateien benötigen die zugehörigen PowerShell-Dateien im selben Ordner; eine einzelne CMD-Datei reicht nicht.
 
 Optional in PowerShell nur herunterladen:
 
 ```powershell
 Invoke-WebRequest 'https://github.com/TimInTech/Sysadmin_Cheatsheet/archive/refs/heads/main.zip' -OutFile "$env:USERPROFILE\Downloads\Sysadmin_Cheatsheet.zip"
 ```
-
-Der `main`-Download enthält Änderungen aus dem Pull Request erst nach dessen Merge.
 
 ## Windows 10 und 11
 
@@ -51,4 +49,4 @@ SSH eignet sich für verschlüsselte Terminalbefehle und mit SFTP/SCP auch für 
 
 ## Teststand
 
-Die automatisierten Prüfungen umfassen Syntax und OpenSSH-Konfigurationsauswertung innerhalb und außerhalb des Netzes. Sie ersetzen keine Tests auf Windows 10/11, keine Anmeldung zwischen zwei physischen Rechnern und keinen Test jeder vorhandenen Firewall- oder SSH-Sonderkonfiguration. Diese praktischen Tests sind vor Verwendung auf fremden Rechnern noch durchzuführen.
+Auf einem Windows-10-Rechner wurden Einrichtung, Passwortanmeldung, STOP und automatischer Ablauf laut Praxistest erfolgreich geprüft. Die Verbindung zwischen Windows und Ubuntu funktionierte in beiden Richtungen. Linux-START und -STOP wurden auf dem produktiven Ubuntu-Rechner nicht ausgeführt; Syntax und SSH-Konfigurationsauswertung wurden geprüft. Windows 11 und abweichende Firewall- oder SSH-Konfigurationen wurden nicht praktisch getestet.
