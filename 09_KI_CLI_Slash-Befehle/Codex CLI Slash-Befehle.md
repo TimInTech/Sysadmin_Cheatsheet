@@ -1,20 +1,8 @@
----
-typ: lernnotiz
-erstellt: 2026-10-22
-herkunft: ki-synthese
-thema: "Codex CLI (OpenAI) – Slash-Befehle"
-tags: [lernen, ki-befehle, codex]
-quellen:
-  - "Menü der installierten Codex CLI 0.163.0 auf Z2 (/ im TUI, 2026-10-22)"
-  - "Spickzettel codex_sheet_1.html (Stand 2026-09-02, CLI 0.151)"
-  - "OpenAI-Codex-Dokumentation (CLI-Unterbefehle)"
----
-
 # Codex CLI – Slash-Befehle
 
-← [[60_Notizen/CLI-Tools/KI-Befehle/KI-Befehle Übersicht|KI-Befehle]]
+Codex CLI 0.163.0, Stand 2026-10-22. Quellen: OpenAI-Codex-Dokumentation (CLI-Unterbefehle) und das Slash-Menü der CLI (`/` im TUI).
 
-> [!hinweis] Stand
+> [!NOTE] Stand
 > Geprüft am **2026-10-22** in **Codex CLI 0.163.0**: `/` im TUI geöffnet und das ganze Menü durchgeblättert. Das Menü hängt von Version, Anmeldung und Feature-Flags ab; `/` zeigt immer, was deine Installation wirklich kennt. Die Slash-Befehle der **ChatGPT-Desktop-App** sind eine andere Liste (z. B. `/cloud`, `/local`, `/project`, `/pin`) und gelten nicht für die CLI.
 
 ## Sitzung und Verlauf
@@ -83,14 +71,14 @@ quellen:
 
 `@` Datei per Fuzzy-Suche anhängen · `!` Shell-Befehl (Ausgabe bleibt lokal) · `$` Skill explizit aufrufen · `Enter` während der Ausführung steuert nach · `Tab` reiht Folgeprompt ein · `Esc Esc` vorherige Nachricht bearbeiten · `Ctrl+R` Verlauf suchen · `Ctrl+G` externer Editor · `Alt+,` / `Alt+.` Reasoning senken/heben.
 
-## Änderungen gegenüber dem Spickzettel (0.151)
+## Änderungen gegenüber Version 0.151
 
 - **Neu im Menü:** `/recap`, `/import`, `/cd`, `/pwd`, `/daemon`, `/warnings`, `/raw`, `/tui`, `/keymap`, `/subagents`, `/delete`, `/plugins`, `/pets`, `/voice`, `/daybreak`, `/usage`, `/config`.
-- **Im 0.163-Menü nicht gesehen** (auf dem Spickzettel noch genannt): `/apps`, `/debug-config`, `/personality`, `/agent` (jetzt `/agents` und `/subagents`), `/realtime` (laut Spickzettel schon in 0.151 entfernt). Ob sie ausgeblendet oder entfernt sind, ist nicht geprüft.
+- **Im 0.163-Menü nicht gesehen** (in 0.151 noch genannt): `/apps`, `/debug-config`, `/personality`, `/agent` (jetzt `/agents` und `/subagents`), `/realtime` (schon in 0.151 entfernt). Ob sie ausgeblendet oder entfernt sind, ist nicht geprüft.
 - `/title` bedeutet jetzt Terminaltitel-Elemente, nicht Sitzungstitel (dafür `/rename`).
 
 ## Terminal-Unterbefehle (außerhalb der TUI)
 
 `codex` · `codex "…"` · `resume` / `fork` (`--last`, `--all`) · `archive` / `unarchive` / `delete` · `agents` · `queue` · `exec` (`--json`, `-o`, `--output-schema`) · `review` (`--uncommitted`, `--base`, `--commit`) · `apply` · `cloud` · `sandbox` · `mcp` · `plugin` · `features` · `doctor` · `update` · `login` / `logout` · `completion` · `remote-control` · `app-server` · `exec-server` · `debug` · `migrate-rollouts`.
 
-Wichtige Flags: `-m`, `-p` (Profil), `-s` (`read-only` · `workspace-write` · `danger-full-access`), `-a` (`on-request` · `never`), `-C`, `--add-dir`, `-i`, `--search`, `--oss`, `-c key=value`, `--strict-config`, `--remote <ADDR>`, `--enable/--disable <FEATURE>`. Startbefehle mit Profil „Pro 2“: [[60_Notizen/CLI-Tools/Agenten- und SSH-Startbefehle]]. Ausführlichere Einführung: [[20_Systeme/CODEX_CLI]].
+Wichtige Flags: `-m`, `-p` (Profil), `-s` (`read-only` · `workspace-write` · `danger-full-access`), `-a` (`on-request` · `never`), `-C`, `--add-dir`, `-i`, `--search`, `--oss`, `-c key=value`, `--strict-config`, `--remote <ADDR>`, `--enable/--disable <FEATURE>`.

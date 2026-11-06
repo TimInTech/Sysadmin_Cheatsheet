@@ -1,20 +1,9 @@
----
-typ: lernnotiz
-erstellt: 2026-10-22
-herkunft: ki-synthese
-thema: "Gemini CLI (Google) – Slash-Befehle"
-tags: [lernen, ki-befehle, gemini]
-quellen:
-  - "geminicli.com/docs/reference/commands (abgerufen 2026-10-22)"
-  - "gemini --help, installierte Version 0.54.0 auf Z2"
----
-
 # Gemini CLI – Slash-Befehle
 
-← [[60_Notizen/CLI-Tools/KI-Befehle/KI-Befehle Übersicht|KI-Befehle]]
+Gemini CLI 0.54.0, Stand 2026-10-22. Quelle: <https://geminicli.com/docs/reference/commands>
 
-> [!hinweis] Stand
-> Aus der offiziellen Befehlsreferenz vom **2026-10-22**; installiert ist 0.54.0. Das TUI selbst wurde hier nicht geöffnet, die Liste ist also dokumentationsbasiert, nicht gegen die Installation geprüft. Zu diesem Tool gab es bisher keinen Spickzettel.
+> [!NOTE] Stand
+> Aus der offiziellen Befehlsreferenz vom **2026-10-22**. Die Liste ist dokumentationsbasiert und wurde nicht im TUI gegengeprüft.
 
 ## Slash-Befehle
 
@@ -64,4 +53,4 @@ quellen:
 
 ## Terminal
 
-`gemini` · `gemini "…"` · `-p` (headless) · `-i` (Prompt, dann interaktiv) · `-m` · `-r latest\|N` · `--list-sessions` · `--delete-session` · `--approval-mode default\|auto_edit\|yolo\|plan` · `-y` · `-s` (Sandbox) · `-w` (Worktree) · `-o text\|json\|stream-json` · `--include-directories` · `--policy` · `--acp`. Unterbefehle: `gemini mcp`, `extensions`, `skills`, `hooks`, `gemma`. Startbefehle: [[60_Notizen/CLI-Tools/Agenten- und SSH-Startbefehle]].
+`gemini` · `gemini "…"` · `-p` (headless) · `-i` (Prompt, dann interaktiv) · `-m` · `-r latest\|N` · `--list-sessions` · `--delete-session` · `--approval-mode default\|auto_edit\|yolo\|plan` · `-y` · `-s` (Sandbox) · `-w` (Worktree) · `-o text\|json\|stream-json` · `--include-directories` · `--policy` · `--acp`. Unterbefehle: `gemini mcp`, `extensions`, `skills`, `hooks`, `gemma`.

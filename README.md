@@ -91,9 +91,12 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Netzwerkstack erkennen (NetworkManager/systemd-networkd) und Netplan pruefen.
 - **[26 DHCP mDNS Avahi](02_Linux/26_DHCP_mDNS_Avahi.md)**
   DHCP-Leases, mDNS-Diensterkennung und Avahi-Status.
-- **[Tastaturbelegung](02_Linux/Tastaturbelegung.md)**
-- **[Ubuntu 26.04 Tastatur-Shortcuts](02_Linux/Ubuntu-26.04-Tastatur-Shortcuts.md)**
-- **[Ubuntu 26.04 Terminal und Anwendungen](02_Linux/Ubuntu-26.04-Terminal-und-Anwendungen.md)**
+- **[27 Ubuntu 26.04 Neuerungen und Anwendungen](02_Linux/27_Ubuntu_26-04_Neuerungen_und_Anwendungen.md)**
+  sudo-rs, uutils, APT 3 mit deb822-Quellen, Snap/Flatpak, Sicherheitswerkzeuge, Anwendungsübersicht sowie Docker und KVM.
+- **[28 Ubuntu 26.04 Tastatur-Shortcuts](02_Linux/28_Ubuntu_26-04_Tastatur_Shortcuts.md)**
+  GNOME-, Plasma- und Bash-Tastenkürzel.
+- **[29 Tastaturbelegung DE und UK](02_Linux/29_Tastaturbelegung_DE_UK.md)**
+  QWERTZ/QWERTY-Unterschiede, AltGr-Zeichen und Layout-Umschaltung unter Linux.
 
 ### 🕵️ 03. Datenrettung und Forensik
 - **[01 Klonen und Imaging](03_Datenrettung_und_Forensik/01_Klonen_und_Imaging.md)**
@@ -156,11 +159,16 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Schritt-für-Schritt-Anleitung zum Weitergeben: Fedora, Nobara und Bazzite bei Freeze, spontanem Neustart oder Oberflächenabsturz, ein Befehl nach dem anderen, Ergebnisse als Datei zurückschicken.
 
 ### 🤖 09. KI-CLI Slash-Befehle
-- **[Antigravity CLI Slash-Befehle](09_KI_CLI_Slash-Befehle/Antigravity%20CLI%20Slash-Befehle.md)**
-- **[ChatGPT Slash-Promptvorlagen](09_KI_CLI_Slash-Befehle/ChatGPT%20Slash-Promptvorlagen.md)**
-- **[Claude Code Slash-Befehle](09_KI_CLI_Slash-Befehle/Claude%20Code%20Slash-Befehle.md)**
-- **[Codex CLI Slash-Befehle](09_KI_CLI_Slash-Befehle/Codex%20CLI%20Slash-Befehle.md)**
-- **[Gemini CLI Slash-Befehle](09_KI_CLI_Slash-Befehle/Gemini%20CLI%20Slash-Befehle.md)**
+- **[Claude Code](09_KI_CLI_Slash-Befehle/Claude%20Code%20Slash-Befehle.md)**
+  Slash-Befehle, Tasten und Terminal-Unterbefehle.
+- **[Codex CLI](09_KI_CLI_Slash-Befehle/Codex%20CLI%20Slash-Befehle.md)**
+  Slash-Befehle, Tasten und Terminal-Unterbefehle.
+- **[Gemini CLI](09_KI_CLI_Slash-Befehle/Gemini%20CLI%20Slash-Befehle.md)**
+  Slash-Befehle und Startoptionen.
+- **[Antigravity CLI](09_KI_CLI_Slash-Befehle/Antigravity%20CLI%20Slash-Befehle.md)**
+  Slash-Befehle, Tasten und Startoptionen von `agy`.
+- **[ChatGPT-Promptvorlagen](09_KI_CLI_Slash-Befehle/ChatGPT%20Slash-Promptvorlagen.md)**
+  96 technische Promptvorlagen für Linux, Windows, Netzwerk, Homelab, Git, Code und IT-Sicherheit.
 
 ---
 

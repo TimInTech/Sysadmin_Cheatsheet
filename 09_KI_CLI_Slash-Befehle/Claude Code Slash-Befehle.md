@@ -1,20 +1,9 @@
----
-typ: lernnotiz
-erstellt: 2026-10-22
-herkunft: ki-synthese
-thema: "Claude Code (Anthropic) – Slash-Befehle"
-tags: [lernen, ki-befehle, claude-code]
-quellen:
-  - "code.claude.com/docs/en/commands (abgerufen 2026-10-22)"
-  - "installierte Version: Claude Code 2.1.308 auf Z2"
----
-
 # Claude Code – Slash-Befehle
 
-← [[60_Notizen/CLI-Tools/KI-Befehle/KI-Befehle Übersicht|KI-Befehle]]
+Claude Code 2.1.308, Stand 2026-10-22. Quelle: <https://code.claude.com/docs/en/commands>
 
-> [!hinweis] Stand
-> Aus der offiziellen Befehlsreferenz vom **2026-10-22**, Version 2.1.308. `/` zeigt, was deine Installation, dein Plan und deine Plugins wirklich anbieten; einige Befehle sind bis zur vollständigen Eingabe ausgeblendet. **[Skill]** = mitgelieferter Skill (ein Prompt, kein fest eingebauter Code). Ausführliche Beispiele, Flags und Umgebungsvariablen: [[20_Systeme/claude-code-cheatsheet]].
+> [!NOTE] Stand
+> Aus der offiziellen Befehlsreferenz vom **2026-10-22**, Version 2.1.308. `/` zeigt, was deine Installation, dein Plan und deine Plugins wirklich anbieten; einige Befehle sind bis zur vollständigen Eingabe ausgeblendet. **[Skill]** = mitgelieferter Skill (ein Prompt, kein fest eingebauter Code).
 
 ## Sitzung und Verlauf
 

@@ -1,20 +1,8 @@
----
-typ: lernnotiz
-erstellt: 2026-10-22
-herkunft: ki-synthese
-thema: "Antigravity CLI (agy) – Slash-Befehle"
-tags: [lernen, ki-befehle, antigravity]
-quellen:
-  - "Menü der installierten Antigravity CLI 1.4.4 auf Z2 (/ im TUI, 2026-10-22)"
-  - "Spickzettel agy_sheet.html (Stand 2026-09-02)"
-  - "antigravity.google/docs (CLI-Abschnitt)"
----
-
 # Antigravity CLI (`agy`) – Slash-Befehle
 
-← [[60_Notizen/CLI-Tools/KI-Befehle/KI-Befehle Übersicht|KI-Befehle]]
+Antigravity CLI 1.4.4, Stand 2026-10-22. Quellen: antigravity.google/docs (CLI-Abschnitt) und das Slash-Menü der CLI (`/` im TUI).
 
-> [!hinweis] Stand
+> [!NOTE] Stand
 > Geprüft am **2026-10-22** in **agy 1.4.4**: `/` im TUI geöffnet und das Menü durchgeblättert. Alias in Klammern. Im Menü stehen danach auch alle installierten Skills als `/skill-name`; die sind keine eingebauten Befehle.
 
 ## Sitzung
@@ -40,7 +28,7 @@ quellen:
 | `/goal` | bis zum Erreichen des Ziels durcharbeiten |
 | `/grill-me` | Agent befragt dich zu Anforderungen, bevor er baut |
 | `/boost` | Multi-Agent-Orchestrator für schwierige Aufgaben |
-| `/teamwork` | Agententeam für große Projekte (Spickzettel: `/teamwork-preview`) |
+| `/teamwork` | Agententeam für große Projekte (früher `/teamwork-preview`) |
 | `/browser` | Browser-Agent für Webaufgaben (Chrome) |
 | `/learn` | aus Erfolgen und Korrekturen wiederverwendbare Skills oder Regeln ableiten |
 | `/schedule` | Anweisung einmalig verzögert oder per Cron wiederkehrend ausführen |
@@ -74,11 +62,11 @@ quellen:
 | `/remote-control` | Fernsteuerung für diese Sitzung (`off` zum Abschalten) |
 | `/feedback` · `/changelog` · `/help` | Rückmeldung · Release-Notes · Hilfe |
 
-## Änderungen gegenüber dem Spickzettel
+## Änderungen gegenüber älteren Versionen
 
 - **Neu:** `/grill-me`, `/learn`, `/schedule`, `/browser`, `/goal`, `/compact`, `/artifact`, `/voice`, `/remote-control`, `/credits`, `/changelog`, `/feedback`.
-- **Nicht mehr im Menü gesehen:** `/planning` (ersetzt durch `/plan`, schon im Spickzettel vermerkt), `/conversation`, `/search`, `/teamwork-preview` (jetzt `/teamwork`).
-- **Modus-Werte** laut `agy --help`: `--mode` kennt `accept-edits`, `auto`, `plan`; `--effort` kennt `low|medium|high|xhigh|max`. Auf dem Spickzettel stand noch `default` und `high` als höchste Stufe.
+- **Nicht mehr im Menü gesehen:** `/planning` (ersetzt durch `/plan`), `/conversation`, `/search`, `/teamwork-preview` (jetzt `/teamwork`).
+- **Modus-Werte** laut `agy --help`: `--mode` kennt `accept-edits`, `auto`, `plan`; `--effort` kennt `low|medium|high|xhigh|max`. Ältere Versionen kannten noch `default` und `high` als höchste Stufe.
 
 ## Tasten
 
@@ -86,4 +74,4 @@ quellen:
 
 ## Terminal
 
-`agy` · `agy "prompt"` · `agy -i "prompt"` · `agy -c` / `--continue` · `--conversation <id>` · `-p` / `--print` (mit `--output-format text|json|stream-json`, `--json-schema`, `--print-timeout`) · `agy models` · `agy agents` · `agy changelog` · `agy mcp` · `agy plugin` (inkl. `import gemini`) · `agy remote-control` · `agy mic-serve` · `agy update` · `agy install`. Flags: `--model`, `--effort`, `--mode`, `--agent`, `--add-dir`, `--project`, `--new-project`, `--sandbox`, `--remote-control`, `--dangerously-skip-permissions`, `--disable-slash-commands`. Konfiguration: `~/.gemini/antigravity-cli/settings.json`. Startbefehle: [[60_Notizen/CLI-Tools/Agenten- und SSH-Startbefehle]].
+`agy` · `agy "prompt"` · `agy -i "prompt"` · `agy -c` / `--continue` · `--conversation <id>` · `-p` / `--print` (mit `--output-format text|json|stream-json`, `--json-schema`, `--print-timeout`) · `agy models` · `agy agents` · `agy changelog` · `agy mcp` · `agy plugin` (inkl. `import gemini`) · `agy remote-control` · `agy mic-serve` · `agy update` · `agy install`. Flags: `--model`, `--effort`, `--mode`, `--agent`, `--add-dir`, `--project`, `--new-project`, `--sandbox`, `--remote-control`, `--dangerously-skip-permissions`, `--disable-slash-commands`. Konfiguration: `~/.gemini/antigravity-cli/settings.json`.
