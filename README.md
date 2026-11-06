@@ -191,6 +191,10 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[01 SMB, NFS, Synology und Tools vom NAS](12_NAS_und_Netzwerkfreigaben/01_SMB_NFS_Synology_und_Tools_vom_NAS.md)**
   Freigaben unter Windows und Linux verbinden, fstab ohne Boot-Hänger, Synology einrichten und portable Werkzeuge vom NAS nutzen.
 
+### 🌐 13. Remotezugriff
+- **[01 RDP, VNC, Tailscale, WireGuard und Wake-on-LAN](13_Remotezugriff/01_RDP_VNC_Tailscale_WireGuard_und_WoL.md)**
+  Bildschirm-Fernzugriff, VPN ohne Portfreigabe, eigenes WireGuard-VPN und Rechner per Netzwerk einschalten.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
