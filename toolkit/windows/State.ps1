@@ -40,3 +40,23 @@ function Invoke-WithRemoteHelpLock {
         $mutex.Dispose()
     }
 }
+
+# The caller must hold the same cross-process lock for the full transaction.
+function Set-ResourceIntent {
+    param(
+        [Parameter(Mandatory=$true)][string]$Path,
+        [Parameter(Mandatory=$true)][ValidateSet('account','firewall','service','task','process')][string]$Kind,
+        [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$Identity,
+        [Parameter(Mandatory=$true)][ValidateNotNullOrEmpty()][string]$Marker
+    )
+    if ([IO.File]::Exists($Path)) { throw 'Eine bisher nicht aufgeloeste Ressourcenabsicht existiert bereits.' }
+    Write-AtomicState -Path $Path -State ([ordered]@{ Kind=$Kind; Identity=$Identity; Marker=$Marker; Phase='pending' })
+}
+
+function Set-ResourceApplied {
+    param([Parameter(Mandatory=$true)][string]$Path, [Parameter(Mandatory=$true)][string]$Identity)
+    $record = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+    if ($record.Identity -cne $Identity -or $record.Phase -cne 'pending') { throw 'Die Ressourcenabsicht passt nicht zur Aktion.' }
+    $record.Phase = 'applied'
+    Write-AtomicState -Path $Path -State $record
+}
