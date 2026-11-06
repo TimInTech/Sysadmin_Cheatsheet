@@ -4,6 +4,9 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 
 **Schnellzugriff:** Das [SSH- und Diagnosepaket mit Downloadanleitung](toolkit/README.md) unterstützt Windows 10/11 und Ubuntu/Debian.
 
+> [!IMPORTANT]
+> **Windows neu installiert? Als Erstes alle Updates und Treiber holen:** [Windows komplett aktualisieren (ein Durchlauf, wenige Neustarts)](01_Windows_11/01_Update_und_Upgrade.md#1-nach-der-neuinstallation-alles-in-einem-durchlauf). Installationsmedien, Rufus, ISO-Dateien und Rettungswerkzeuge: [Download-Links](04_Rettungsmedien_und_Live_Systeme/04_Download_Links.md).
+
 ---
 
 ## Sicherheitshinweis
@@ -16,9 +19,9 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 
 ## Inhaltsverzeichnis
 
-### 🪟 01. Windows 11
+### 🪟 01. Windows 10 und 11
 - **[01 Update und Upgrade](01_Windows_11/01_Update_und_Upgrade.md)**
-  PowerShell-Befehle (PSWindowsUpdate), Feature-Updates und Store-Updates erzwingen.
+  **Nach der Neuinstallation:** alle Updates und Treiber in einem Durchlauf, Skripte erlauben (Execution Policy), Versionsunterschiede, Feature- und Store-Updates, Problembehandlung.
 - **[02 Standardsoftware Deployment](01_Windows_11/02_Standardsoftware_Deployment.md)**
   Winget-Skripte (JSON), Silent Installs und Windows-Bloatware per Skript entfernen.
 - **[03 Systemreparatur und Wartung](01_Windows_11/03_Systemreparatur_und_Wartung.md)**
@@ -117,6 +120,8 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
   Schritt-für-Schritt Anleitung, um aus einem Live-System in eine defekte Linux-Installation einzusteigen (mount --bind /dev, /proc, /sys).
 - **[03 Windows RE (Recovery Environment)](04_Rettungsmedien_und_Live_Systeme/03_Windows_RE.md)**
   Bootrec, Bcdboot und Offline-SFC/DISM Reparaturen aus der blauen Windows-Kommandozeile.
+- **[04 Download-Links](04_Rettungsmedien_und_Live_Systeme/04_Download_Links.md)**
+  Rufus und Ventoy, Windows-10/11-ISO, Linux-Distributionen, Rettungssysteme (Hiren's BootCD PE, Medicat, SystemRescue), Pentesting und portable Diagnosewerkzeuge.
 
 ### 🖥️ 05. Proxmox VE
 - **[01 Status, Versionen und Logs](05_Proxmox_VE/01_Status_Versionen_und_Logs.md)**
