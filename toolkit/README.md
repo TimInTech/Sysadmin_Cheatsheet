@@ -9,7 +9,7 @@ Der Linux-Entwurf unter `linux/` richtet einen zeitlich begrenzten Zugang ein. E
 ## Bisherige Prüfung und offene Punkte
 
 - In einer isolierten Ubuntu-26.04-VM wurden Erstinstallation, richtige und falsche Passwörter, Verweigerung am bestehenden SSH-Dienst, STOP, Neustart und beschleunigter Ablauf geprüft. Ein weiterer Test prüfte den Ablauf bei blockierter Einrichtung und offener Sitzung. Das ist kein Test von einem zweiten physischen Rechner oder auf anderen Linux-Versionen.
-- Windows PowerShell 5.1 sowie echte Windows-10- und Windows-11-Systeme wurden bisher nicht getestet. Der Windows-SSH-Entwurf hat offene Fragen zur Prozesslebensdauer, Nebenläufigkeit und zum Installationszustand; er bleibt gesperrt.
+- Auf einem GitHub-Actions-Windows-Server-Runner bestanden PSScriptAnalyzer und 18 Pester-Tests mit Windows PowerShell 5.1. Echte Windows-10- und Windows-11-Systeme wurden nicht getestet. Der Windows-SSH-Entwurf hat offene Fragen zur Prozesslebensdauer, Nebenläufigkeit und zum Installationszustand; er bleibt gesperrt.
 - Ein dauerhafter Zugang, Firewallintegration, vollständige Integrationstests und ein Downloadpaket fehlen. CI ersetzt keine Tests auf echten Zielsystemen.
 
 Die vorhandenen Anleitungen zu [Windows OpenSSH](../01_Windows_11/11_OpenSSH_Server_Ubuntu_Zugriff.md) und [Linux SSH](../02_Linux/04_SSH_und_Remote_Zugriff.md) beschreiben die manuelle Einrichtung und Diagnose.
