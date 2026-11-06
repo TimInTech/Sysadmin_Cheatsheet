@@ -199,6 +199,10 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[01 Notfall-Spickzettel](14_Reparatur_Spickzettel/01_Notfall_Spickzettel.md)**
   Windows startet nicht, GRUB reparieren, Passwort zurücksetzen, Daten von defekter Platte retten und SMART prüfen. Verweist auf die ausführlichen Seiten.
 
+### 15. Drucker und Scanner
+- **[01 Drucker und Scanner: CUPS und Windows](15_Drucker_und_Scanner/01_Drucker_und_Scanner_CUPS_und_Windows.md)**
+  Netzwerkdrucker treiberlos einrichten, Druckaufträge steuern, hängende Warteschlange lösen, Scanner mit SANE und unter Windows.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
