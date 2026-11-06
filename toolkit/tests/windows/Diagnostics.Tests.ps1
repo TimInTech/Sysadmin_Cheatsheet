@@ -1,6 +1,6 @@
 Describe 'Windows diagnostic entry points' {
     BeforeAll {
-        $root = Split-Path $PSScriptRoot -Parent
+        $root = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'windows\zusatz'
         $script = Join-Path $root 'DIAGNOSE.ps1'
     }
     It 'parses in Windows PowerShell' {
@@ -19,7 +19,7 @@ Describe 'Windows diagnostic entry points' {
 
 Describe 'System repair confirmation' {
     BeforeAll {
-        . (Join-Path (Split-Path $PSScriptRoot -Parent) 'Repair.ps1')
+        . (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'windows\zusatz\Repair.ps1')
         function Test-Admin { $true }
         function Invoke-NativeChecked([string]$Program, [string[]]$Arguments) {}
     }

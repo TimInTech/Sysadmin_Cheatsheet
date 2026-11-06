@@ -1,5 +1,5 @@
 Describe 'SSH starter' {
-    BeforeAll { $root = Split-Path $PSScriptRoot -Parent }
+    BeforeAll { $root = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'windows' }
     It 'parses in Windows PowerShell' {
         $tokens = $null; $errors = $null
         [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $root 'SSH_EINRICHTEN.ps1'), [ref]$tokens, [ref]$errors)
