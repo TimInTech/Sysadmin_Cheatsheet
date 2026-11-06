@@ -21,6 +21,7 @@ jobs:
           bash toolkit/linux/tests/test-termination.sh
   windows:
     runs-on: windows-2022
+    timeout-minutes: 10
     defaults:
       run:
         shell: powershell
@@ -32,6 +33,12 @@ jobs:
           if ($capability.State -ne 'Installed') {
             Add-WindowsCapability -Online -Name $capability.Name -ErrorAction Stop | Out-Null
           }
+      - name: Install isolated SSH test client
+        run: |
+          python -m venv "$env:RUNNER_TEMP\toolkit-ssh-test"
+          & "$env:RUNNER_TEMP\toolkit-ssh-test\Scripts\python.exe" -m pip install 'paramiko>=3.5,<5'
+          if ($LASTEXITCODE -ne 0) { throw 'Installation des Testclients fehlgeschlagen.' }
+          "TOOLKIT_TEST_PYTHON=$env:RUNNER_TEMP\toolkit-ssh-test\Scripts\python.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: PowerShell 5.1, Pester and ScriptAnalyzer
         run: |
           if ($PSVersionTable.PSVersion.Major -ne 5) { throw 'Windows PowerShell 5.1 required' }

@@ -13,10 +13,18 @@ if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administra
     throw 'Bitte per Rechtsklick als Administrator ausfuehren.'
 }
 . "$PSScriptRoot\State.ps1"
+. "$PSScriptRoot\TaskStop.ps1"
 function Save-State($State) { Write-AtomicState -Path $statePath -State $State }
 function Stop-RemoteHelp {
     if (-not (Test-Path -LiteralPath $statePath)) { Write-Host 'Kein Toolkit-Zugang gefunden.'; return }
     $state = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
+    $installationPath = Join-Path $root 'intent-installation.json'
+    if (Test-Path -LiteralPath $installationPath) {
+        $installation = Get-Content -LiteralPath $installationPath -Raw | ConvertFrom-Json
+        if ($installation.Phase -ne 'completed') {
+            throw 'Die OpenSSH-Installation wurde unterbrochen. Dienst und Firewallregel muessen manuell geprueft werden; der Zustand bleibt erhalten.'
+        }
+    }
     if ($state.UserName -and -not $state.UserSid -and $state.UserMarker) {
         $candidate = Get-LocalUser -Name $state.UserName -ErrorAction SilentlyContinue
         if ($candidate -and $candidate.Description -ceq $state.UserMarker) { $state.UserSid = $candidate.SID.Value }
@@ -33,6 +41,7 @@ function Stop-RemoteHelp {
                 throw 'Die Supervisor-Aufgabe wurde fremd geaendert. Kein automatischer Rueckbau.'
             }
             if ($task.State -eq 'Running') { Stop-ScheduledTask -InputObject $task -ErrorAction Stop }
+            Wait-SupervisorTaskStopped -Name $state.SupervisorTask
             Unregister-ScheduledTask -InputObject $task -Confirm:$false -ErrorAction Stop
         }
     }
@@ -41,6 +50,7 @@ function Stop-RemoteHelp {
         if ($process -and $process.ProcessName -eq 'sshd' -and $process.StartTime.ToUniversalTime().ToString('o') -eq $state.ProcessStart) {
             & "$env:WINDIR\System32\taskkill.exe" /PID $process.Id /T /F | Out-Null
             if ($LASTEXITCODE -ne 0) { throw 'Der eigene SSH-Prozessbaum konnte nicht beendet werden.' }
+            if (-not $process.WaitForExit(10000)) { throw 'Der eigene SSH-Prozess laeuft weiterhin. Der Rueckbau wurde angehalten.' }
         }
     }
     if ($state.FirewallName) { Get-NetFirewallRule -Name $state.FirewallName -ErrorAction SilentlyContinue | Remove-NetFirewallRule }
@@ -56,7 +66,7 @@ function Stop-RemoteHelp {
         Unregister-ScheduledTask -InputObject $cleanupTask -Confirm:$false -ErrorAction Stop
     }
     Remove-Item -LiteralPath $statePath -Force
-    foreach ($file in @('RemoteHelp.ps1','State.ps1','SshSupervisor.ps1','JobSupervisor.cs','supervisor.json','ready.json','intent-account.json','intent-firewall.json','intent-supervisor-task.json','sshd_config','ssh_host_ed25519_key','ssh_host_ed25519_key.pub')) {
+    foreach ($file in @('RemoteHelp.ps1','State.ps1','TaskStop.ps1','SshSupervisor.ps1','JobSupervisor.cs','supervisor.json','ready.json','intent-installation.json','intent-account.json','intent-firewall.json','intent-supervisor-task.json','sshd_config','ssh_host_ed25519_key','ssh_host_ed25519_key.pub')) {
         Remove-Item -LiteralPath (Join-Path $root $file) -Force -ErrorAction SilentlyContinue
     }
     if (-not (Test-Path -LiteralPath $ownedInstall)) { Remove-Item -LiteralPath $root -Force -ErrorAction SilentlyContinue }
@@ -102,6 +112,7 @@ foreach ($sid in @('S-1-5-18','S-1-5-32-544')) {
 Set-Acl -LiteralPath $root -AclObject $acl
 Copy-Item -LiteralPath $PSCommandPath -Destination (Join-Path $root 'RemoteHelp.ps1')
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'State.ps1') -Destination (Join-Path $root 'State.ps1')
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'TaskStop.ps1') -Destination (Join-Path $root 'TaskStop.ps1')
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'SshSupervisor.ps1') -Destination (Join-Path $root 'SshSupervisor.ps1')
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'JobSupervisor.cs') -Destination (Join-Path $root 'JobSupervisor.cs')
 $state = [ordered]@{ UserName=''; UserSid=''; UserMarker=''; FirewallName=''; ProcessId=0; ProcessStart=''; SupervisorTask=''; SupervisorExecutable=''; SupervisorArguments=''; CleanupExecutable=''; CleanupArguments='' }
@@ -117,12 +128,18 @@ try {
     $cap = Get-WindowsCapability -Online -Name 'OpenSSH.Server~~~~0.0.1.0'
     if ($cap.State -ne 'Installed') {
         $oldRule = Get-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -ErrorAction SilentlyContinue
+        $installationPath = Join-Path $root 'intent-installation.json'
+        $installation = [ordered]@{ Phase='pending'; Capability=$cap.Name; InitialState=$cap.State.ToString(); FirewallRuleExisted=[bool]$oldRule }
+        Write-AtomicState -Path $installationPath -State $installation
         Add-WindowsCapability -Online -Name $cap.Name | Out-Null
         if (-not $oldRule) {
             $newRule = Get-NetFirewallRule -Name 'OpenSSH-Server-In-TCP' -ErrorAction SilentlyContinue
             if ($newRule) { Remove-NetFirewallRule -InputObject $newRule }
         }
+        Set-Service sshd -StartupType Disabled
         Set-Content -LiteralPath $ownedInstall -Value 'OpenSSH installed by Sysadmin Toolkit' -Encoding ASCII
+        $installation.Phase = 'completed'
+        Write-AtomicState -Path $installationPath -State $installation
     }
     Set-Service sshd -StartupType Disabled
     $name = 'remotehelp'; $index = 0
@@ -151,15 +168,17 @@ try {
     $state.UserName = $name; $state.UserSid = $user.SID.Value; Save-State $state
     Set-ResourceApplied -Path $accountIntent -Identity $name
     $key = Join-Path $root 'ssh_host_ed25519_key'
-    & "$env:WINDIR\System32\OpenSSH\ssh-keygen.exe" -q -t ed25519 -N '""' -f $key
-    if ($LASTEXITCODE -ne 0) { throw 'SSH-Hostschluessel konnte nicht erstellt werden.' }
+    $keygen = Start-Process "$env:WINDIR\System32\OpenSSH\ssh-keygen.exe" -ArgumentList "-q -t ed25519 -N `"`" -f `"$key`"" -PassThru -NoNewWindow
+    if (-not $keygen.WaitForExit(15000)) { $keygen.Kill(); throw 'ssh-keygen ueberschritt sein Zeitlimit.' }
+    if ($keygen.ExitCode -ne 0) { throw 'SSH-Hostschluessel konnte nicht erstellt werden.' }
     $port = 22422
     if (Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) { throw 'Der Toolkit-Port 22422 ist bereits belegt.' }
     $config = Join-Path $root 'sshd_config'
     @("Port $port", "ListenAddress $($selected.IP)", "HostKey $($key.Replace('\','/'))", "AllowUsers $name@$($selected.Subnet)", 'PasswordAuthentication yes', 'PubkeyAuthentication no', 'PermitEmptyPasswords no') | Set-Content -LiteralPath $config -Encoding ASCII
     $exe = "$env:WINDIR\System32\OpenSSH\sshd.exe"
-    & $exe -t -f $config
-    if ($LASTEXITCODE -ne 0) { throw 'SSH-Konfiguration ist ungueltig.' }
+    $check = Start-Process $exe -ArgumentList "-t -f `"$config`"" -PassThru -NoNewWindow
+    if (-not $check.WaitForExit(15000)) { $check.Kill(); throw 'sshd-Konfigurationspruefung ueberschritt ihr Zeitlimit.' }
+    if ($check.ExitCode -ne 0) { throw 'SSH-Konfiguration ist ungueltig.' }
     $state.FirewallName = 'SysadminToolkitRemoteHelp-' + [guid]::NewGuid().ToString('N'); Save-State $state
     $firewallIntent = Join-Path $root 'intent-firewall.json'
     Set-ResourceIntent -Path $firewallIntent -Kind firewall -Identity $state.FirewallName -Marker $state.UserMarker

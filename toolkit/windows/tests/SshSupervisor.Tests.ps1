@@ -36,8 +36,9 @@ Describe 'Supervised process lifecycle' {
         $exe = "$env:WINDIR\System32\OpenSSH\sshd.exe"
         if (-not (Test-Path $exe)) { throw 'OpenSSH Server fehlt auf dem Testsystem.' }
         $key = Join-Path $TestDrive 'host_ed25519'
-        & "$env:WINDIR\System32\OpenSSH\ssh-keygen.exe" -q -t ed25519 -N '""' -f $key
-        if ($LASTEXITCODE -ne 0) { throw 'Test-Hostschluessel konnte nicht erzeugt werden.' }
+        $keygen = Start-Process "$env:WINDIR\System32\OpenSSH\ssh-keygen.exe" -ArgumentList "-q -t ed25519 -N `"`" -f `"$key`"" -PassThru -NoNewWindow
+        if (-not $keygen.WaitForExit(15000)) { $keygen.Kill(); throw 'ssh-keygen ueberschritt sein Zeitlimit.' }
+        if ($keygen.ExitCode -ne 0) { throw 'Test-Hostschluessel konnte nicht erzeugt werden.' }
         $probe = [Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback, 0)
         $probe.Start(); $port = $probe.LocalEndpoint.Port; $probe.Stop()
         $config = Join-Path $TestDrive 'test_sshd_config'
