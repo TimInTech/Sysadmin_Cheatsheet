@@ -187,6 +187,10 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[01 Checkliste Windows und Ubuntu](11_Ersteinrichtung/01_Checkliste_Windows_und_Ubuntu.md)**
   Feste Reihenfolge nach der Neuinstallation: Updates, Treiber, Sicherheit, Programme, Backup. Dazu die winget-Paketliste [programme.winget.json](11_Ersteinrichtung/programme.winget.json) zum Importieren.
 
+### 14. Reparatur-Spickzettel
+- **[01 Notfall-Spickzettel](14_Reparatur_Spickzettel/01_Notfall_Spickzettel.md)**
+  Windows startet nicht, GRUB reparieren, Passwort zurücksetzen, Daten von defekter Platte retten und SMART prüfen. Verweist auf die ausführlichen Seiten.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
