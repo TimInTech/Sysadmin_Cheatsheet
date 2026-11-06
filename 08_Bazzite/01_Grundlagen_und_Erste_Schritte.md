@@ -18,7 +18,7 @@
 ### Bazzite gegenüber Fedora Workstation
 
 | Thema | Bazzite | Fedora Workstation |
-|---|---|---|
+| --- | --- | --- |
 | Basis | Versioniertes OCI-Systemimage | Einzelne RPM-Pakete |
 | Host-Installation | Flatpak/Brew/Container bevorzugt | `dnf` üblich |
 | Update | Neues Deployment, Neustart | Laufendes Paket-Upgrade |

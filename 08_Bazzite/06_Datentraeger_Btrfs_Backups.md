@@ -131,7 +131,7 @@ ujust configure-snapshots disable
 ## 6. Praktische 3-2-1-Backupstrategie
 
 | Ebene | Was sichern | Methode |
-|---|---|---|
+| --- | --- | --- |
 | System | Imagequelle, Layerliste, Deploymentstatus | OSTree-Rollback + exportierte Statusdatei |
 | Konfiguration | `/etc`, Dotfiles, Quadlets, Compose-Dateien | Restic/Borg auf externes Ziel |
 | Benutzerdaten | `/var/home/USER` | Pika Backup, Déjà Dup, Restic oder Borg |

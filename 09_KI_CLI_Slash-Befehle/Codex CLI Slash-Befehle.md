@@ -8,7 +8,7 @@ Codex CLI 0.163.0, Stand 2026-10-22. Quellen: OpenAI-Codex-Dokumentation (CLI-Un
 ## Sitzung und Verlauf
 
 | Befehl | Wirkung |
-|---|---|
+| --- | --- |
 | `/new` | neuen Chat in laufender Sitzung beginnen |
 | `/clear` | Terminal leeren und neuen Chat starten |
 | `/resume` | gespeicherten Chat fortsetzen |
@@ -27,7 +27,7 @@ Codex CLI 0.163.0, Stand 2026-10-22. Quellen: OpenAI-Codex-Dokumentation (CLI-Un
 ## Arbeiten und Prüfen
 
 | Befehl | Wirkung |
-|---|---|
+| --- | --- |
 | `/init` | `AGENTS.md` mit Projektanweisungen anlegen |
 | `/plan` | Plan-Modus |
 | `/goal` | Ziel für lange Aufgabe setzen oder anzeigen |
@@ -44,7 +44,7 @@ Codex CLI 0.163.0, Stand 2026-10-22. Quellen: OpenAI-Codex-Dokumentation (CLI-Un
 ## Modell, Rechte, Einstellungen
 
 | Befehl | Wirkung |
-|---|---|
+| --- | --- |
 | `/model` | Modell und Reasoning-Aufwand |
 | `/fast` | Fast-Tier (1,5× Tempo) |
 | `/permissions` | Freigabe- bzw. Rechteprofil |

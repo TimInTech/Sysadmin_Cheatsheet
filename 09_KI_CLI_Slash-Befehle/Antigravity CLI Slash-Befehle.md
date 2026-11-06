@@ -8,7 +8,7 @@ Antigravity CLI 1.4.4, Stand 2026-10-22. Quellen: antigravity.google/docs (CLI-A
 ## Sitzung
 
 | Befehl | Wirkung |
-|---|---|
+| --- | --- |
 | `/resume` (`/switch`) | frühere Unterhaltungen durchsuchen und fortsetzen |
 | `/rewind` (`/undo`) | zu früherer Nachricht zurückspulen |
 | `/fork` (`/branch`) | Unterhaltung an dieser Stelle abzweigen, optional in anderes Projekt |
@@ -23,7 +23,7 @@ Antigravity CLI 1.4.4, Stand 2026-10-22. Quellen: antigravity.google/docs (CLI-A
 ## Arbeiten
 
 | Befehl | Wirkung |
-|---|---|
+| --- | --- |
 | `/plan` | vor der Ausführung sorgfältig planen |
 | `/goal` | bis zum Erreichen des Ziels durcharbeiten |
 | `/grill-me` | Agent befragt dich zu Anforderungen, bevor er baut |
@@ -45,7 +45,7 @@ Antigravity CLI 1.4.4, Stand 2026-10-22. Quellen: antigravity.google/docs (CLI-A
 ## Kontext, Modell, Rechte
 
 | Befehl | Wirkung |
-|---|---|
+| --- | --- |
 | `/context` | Kontextauslastung visualisieren |
 | `/add-dir` | Verzeichnis zum Workspace hinzufügen |
 | `/model` | Modell setzen oder einen einzelnen Prompt mit anderem Modell laufen lassen |

@@ -5,7 +5,7 @@ Unterschiede der beiden Layouts, Sonderzeichen per AltGr und das Umschalten des 
 ## 1. Zahlenreihe und Sonderzeichen im Vergleich
 
 | Taste | DE (QWERTZ) | UK (QWERTY) |
-|---|---|---|
+| --- | --- | --- |
 | links neben `1` | `^` `°` | `` ` `` `¬` |
 | `2` | `2` `"` | `2` `"` |
 | `3` | `3` `§` | `3` `£` |
@@ -28,7 +28,7 @@ Nur DE: Umlaute `Ä Ö Ü` und `ß`. Nur UK: `£` und `¬`.
 ## 2. Sonderzeichen per AltGr (DE-Layout)
 
 | Zeichen | Tasten |
-|---|---|
+| --- | --- |
 | `@` | `AltGr + Q` |
 | `€` | `AltGr + E` |
 | `\` | `AltGr + ß` |

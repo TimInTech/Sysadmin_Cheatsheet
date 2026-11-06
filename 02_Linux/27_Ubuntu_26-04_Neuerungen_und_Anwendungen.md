@@ -52,7 +52,7 @@ sudo do-release-upgrade
 ### Snap
 
 | Befehl | Zweck |
-|---|---|
+| --- | --- |
 | `sudo snap install NAME` | Installieren (`--classic` nur, wenn der Snap es verlangt) |
 | `snap list` | Installierte Snaps |
 | `snap info NAME` | Kanäle und Versionen |
@@ -73,7 +73,7 @@ flatpak uninstall org.example.AppName
 ## 3. Sicherheit
 
 | Werkzeug | Einrichtung | Hinweis |
-|---|---|---|
+| --- | --- | --- |
 | `ufw` | `sudo ufw allow 22/tcp` → `sudo ufw enable` → `sudo ufw status verbose` | Paket vorhanden, standardmäßig **inaktiv**. Erst SSH erlauben, dann aktivieren, sonst sperrt man sich bei Remote-Zugriff aus. Details: [Netzwerk und Dienste](03_Netzwerk_und_Dienste.md). |
 | `unattended-upgrades` | `sudo dpkg-reconfigure --priority=low unattended-upgrades` | Automatische Sicherheitsupdates, in Ubuntu meist schon aktiv. |
 | `lynis` | `sudo lynis audit system` | Auditbericht, ersetzt keine Härtung. |
@@ -83,7 +83,7 @@ flatpak uninstall org.example.AppName
 ## 4. Netzwerkwerkzeuge installieren
 
 | Werkzeug | Zweck | Paket |
-|---|---|---|
+| --- | --- | --- |
 | `nmap` | Port- und Hostscan | `nmap` |
 | `traceroute` | Route zum Ziel | `traceroute` |
 | `iperf3` | Bandbreite messen (Server `iperf3 -s`, Client `iperf3 -c SERVERIP`) | `iperf3` |
@@ -103,7 +103,7 @@ Installation: `sudo apt install PAKET` oder `sudo snap install PAKET`.
 Terminal-Werkzeuge (APT): `htop`, `ncdu`, `git`, `unzip`, `build-essential`, `tmux`, `screen`, `rsync`, `xrdp` (Fernzugriff per RDP), `fastfetch`. `net-tools` nur für Altbefehle wie `ifconfig`.
 
 | Bereich | Aus dem Archiv (APT) | Als Snap | Nicht im Archiv |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Browser | `firefox`, `chromium-browser` (installieren jeweils den Snap) | – | `vivaldi`, `brave-browser`, `opera` (Herstellerquelle nötig) |
 | Büro und PDF | `libreoffice`, `thunderbird`, `okular`, `xournalpp`, `keepassxc` | `bitwarden` | `foxit-reader` |
 | Grafik und Foto | `gimp`, `inkscape`, `krita`, `darktable`, `shotwell`, `kolourpaint`, `blender` | – | `qview` |

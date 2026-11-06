@@ -3,7 +3,7 @@
 ## 1. Bazzite Quick Commands
 
 | Zweck | Befehl |
-|---|---|
+| --- | --- |
 | Version | `cat /etc/os-release` |
 | Image/Deployment | `rpm-ostree status -v` |
 | bootc-Status | `bootc status` |
@@ -26,7 +26,7 @@
 ## 2. Troubleshooting nach Fehlerbild
 
 | Problem | Diagnose | Mögliche Ursache | Lösung |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | System startet nicht | GRUB `:1`, vorheriger Boot, Deploymentstatus | Defektes Deployment/Bootloader | Vorheriges Deployment; `brh rollback`; offizielles Live-Bootloader-Tool |
 | Update fehlgeschlagen | `ujust update`, Status, Platz, rpm-ostreed-Log | Platz, Layerkonflikt, parallele Transaktion | Platzursache beheben; warten; problematischen Layer entfernen |
 | Schwarzer Bildschirm | TTY, GPU-Kernellog, `lspci -nnk` | GPU-/Kernelregression, falsches Image | Vorheriges Deployment; passende Imagevariante prüfen |
