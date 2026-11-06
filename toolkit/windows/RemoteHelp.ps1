@@ -26,6 +26,16 @@ function Stop-RemoteHelp {
         $user = Get-LocalUser -Name $state.UserName -ErrorAction SilentlyContinue
         if ($user -and $user.SID.Value -eq $state.UserSid) { Disable-LocalUser -SID $user.SID }
     }
+    if ($state.SupervisorTask) {
+        $task = Get-ScheduledTask -TaskName $state.SupervisorTask -TaskPath '\' -ErrorAction SilentlyContinue
+        if ($task) {
+            if (@($task.Actions).Count -ne 1 -or $task.Actions[0].Execute -ine $state.SupervisorExecutable -or $task.Actions[0].Arguments -cne $state.SupervisorArguments) {
+                throw 'Die Supervisor-Aufgabe wurde fremd geaendert. Kein automatischer Rueckbau.'
+            }
+            if ($task.State -eq 'Running') { Stop-ScheduledTask -InputObject $task -ErrorAction Stop }
+            Unregister-ScheduledTask -InputObject $task -Confirm:$false -ErrorAction Stop
+        }
+    }
     if ($state.ProcessId -and $state.ProcessStart) {
         $process = Get-Process -Id $state.ProcessId -ErrorAction SilentlyContinue
         if ($process -and $process.ProcessName -eq 'sshd' -and $process.StartTime.ToUniversalTime().ToString('o') -eq $state.ProcessStart) {
@@ -38,14 +48,25 @@ function Stop-RemoteHelp {
         $user = Get-LocalUser -Name $state.UserName -ErrorAction SilentlyContinue
         if ($user -and $user.SID.Value -eq $state.UserSid) { Remove-LocalUser -SID $user.SID }
     }
-    Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
+    $cleanupTask = Get-ScheduledTask -TaskName $taskName -TaskPath '\' -ErrorAction SilentlyContinue
+    if ($cleanupTask) {
+        if (@($cleanupTask.Actions).Count -ne 1 -or $cleanupTask.Actions[0].Execute -ine $state.CleanupExecutable -or $cleanupTask.Actions[0].Arguments -cne $state.CleanupArguments) {
+            throw 'Die Ablauf-Aufgabe wurde fremd geaendert. Kein automatischer Rueckbau.'
+        }
+        Unregister-ScheduledTask -InputObject $cleanupTask -Confirm:$false -ErrorAction Stop
+    }
     Remove-Item -LiteralPath $statePath -Force
-    foreach ($file in @('RemoteHelp.ps1','State.ps1','sshd_config','ssh_host_ed25519_key','ssh_host_ed25519_key.pub')) {
+    foreach ($file in @('RemoteHelp.ps1','State.ps1','SshSupervisor.ps1','JobSupervisor.cs','supervisor.json','ready.json','intent-account.json','intent-firewall.json','intent-supervisor-task.json','sshd_config','ssh_host_ed25519_key','ssh_host_ed25519_key.pub')) {
         Remove-Item -LiteralPath (Join-Path $root $file) -Force -ErrorAction SilentlyContinue
     }
     if (-not (Test-Path -LiteralPath $ownedInstall)) { Remove-Item -LiteralPath $root -Force -ErrorAction SilentlyContinue }
     Write-Host 'Konto deaktiviert und eigene Regel entfernt. Bestehende SSH-Konfiguration blieb unveraendert.'
 }
+$mutex = New-Object System.Threading.Mutex($false, 'Global\SysadminToolkitRemoteHelp')
+$mutexHeld = $false
+try {
+    try { $mutexHeld = $mutex.WaitOne() }
+    catch [System.Threading.AbandonedMutexException] { $mutexHeld = $true }
 if ($Action -ne 'Start') { Stop-RemoteHelp; return }
 if (Test-Path -LiteralPath $statePath) { throw 'Ein Toolkit-Zugang existiert bereits. Erst STOP_HIER ausfuehren.' }
 $service = Get-CimInstance Win32_Service -Filter "Name='sshd'" -ErrorAction SilentlyContinue
@@ -81,11 +102,16 @@ foreach ($sid in @('S-1-5-18','S-1-5-32-544')) {
 Set-Acl -LiteralPath $root -AclObject $acl
 Copy-Item -LiteralPath $PSCommandPath -Destination (Join-Path $root 'RemoteHelp.ps1')
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'State.ps1') -Destination (Join-Path $root 'State.ps1')
-$state = [ordered]@{ UserName=''; UserSid=''; UserMarker=''; FirewallName=''; ProcessId=0; ProcessStart='' }
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'SshSupervisor.ps1') -Destination (Join-Path $root 'SshSupervisor.ps1')
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'JobSupervisor.cs') -Destination (Join-Path $root 'JobSupervisor.cs')
+$state = [ordered]@{ UserName=''; UserSid=''; UserMarker=''; FirewallName=''; ProcessId=0; ProcessStart=''; SupervisorTask=''; SupervisorExecutable=''; SupervisorArguments=''; CleanupExecutable=''; CleanupArguments='' }
 Save-State $state
 try {
     $expires = (Get-Date).AddHours(2)
-    $cleanup = New-ScheduledTaskAction -Execute "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$root\RemoteHelp.ps1`" -Action Expire"
+    $state.CleanupExecutable = "$env:WINDIR\System32\WindowsPowerShell\v1.0\powershell.exe"
+    $state.CleanupArguments = "-NoProfile -ExecutionPolicy Bypass -File `"$root\RemoteHelp.ps1`" -Action Expire"
+    Save-State $state
+    $cleanup = New-ScheduledTaskAction -Execute $state.CleanupExecutable -Argument $state.CleanupArguments
     $triggers = @((New-ScheduledTaskTrigger -Once -At $expires),(New-ScheduledTaskTrigger -AtStartup))
     Register-ScheduledTask -TaskName $taskName -Action $cleanup -Trigger $triggers -User 'SYSTEM' -RunLevel Highest | Out-Null
     $cap = Get-WindowsCapability -Online -Name 'OpenSSH.Server~~~~0.0.1.0'
@@ -102,6 +128,8 @@ try {
     $name = 'remotehelp'; $index = 0
     while (Get-LocalUser -Name $name -ErrorAction SilentlyContinue) { $index++; $name = "remotehelp$index"; if ($index -gt 99) { throw 'Kein freier Kontoname.' } }
     $state.UserName = $name; $state.UserMarker = 'SysadminToolkit-' + [guid]::NewGuid().ToString('N'); Save-State $state
+    $accountIntent = Join-Path $root 'intent-account.json'
+    Set-ResourceIntent -Path $accountIntent -Kind account -Identity $name -Marker $state.UserMarker
     $alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'
     $rng = [Security.Cryptography.RandomNumberGenerator]::Create()
     $password = ''; $buffer = New-Object byte[] 1
@@ -121,6 +149,7 @@ try {
     $user = New-LocalUser -Name $name -Password $securePassword -AccountExpires $expires -Description $state.UserMarker
     $securePassword.Dispose()
     $state.UserName = $name; $state.UserSid = $user.SID.Value; Save-State $state
+    Set-ResourceApplied -Path $accountIntent -Identity $name
     $key = Join-Path $root 'ssh_host_ed25519_key'
     & "$env:WINDIR\System32\OpenSSH\ssh-keygen.exe" -q -t ed25519 -N '""' -f $key
     if ($LASTEXITCODE -ne 0) { throw 'SSH-Hostschluessel konnte nicht erstellt werden.' }
@@ -132,16 +161,45 @@ try {
     & $exe -t -f $config
     if ($LASTEXITCODE -ne 0) { throw 'SSH-Konfiguration ist ungueltig.' }
     $state.FirewallName = 'SysadminToolkitRemoteHelp-' + [guid]::NewGuid().ToString('N'); Save-State $state
+    $firewallIntent = Join-Path $root 'intent-firewall.json'
+    Set-ResourceIntent -Path $firewallIntent -Kind firewall -Identity $state.FirewallName -Marker $state.UserMarker
     New-NetFirewallRule -Name $state.FirewallName -DisplayName 'Sysadmin Toolkit Remote Help' -Direction Inbound -Action Allow -Protocol TCP -LocalPort $port -LocalAddress $selected.IP -RemoteAddress $selected.Subnet | Out-Null
-    $process = Start-Process -FilePath $exe -ArgumentList "-D -f `"$config`"" -PassThru
+    Set-ResourceApplied -Path $firewallIntent -Identity $state.FirewallName
+    $supervisorState = Join-Path $root 'supervisor.json'
+    $ready = Join-Path $root 'ready.json'
+    Write-AtomicState -Path $supervisorState -State @{ Executable=$exe; Arguments="-D -f `"$config`""; DeadlineUtc=$expires.ToUniversalTime().ToString('o'); ReadyPath=$ready }
+    $state.SupervisorTask = 'SysadminToolkitSupervisor-' + [guid]::NewGuid().ToString('N')
+    $state.SupervisorExecutable = $state.CleanupExecutable
+    $state.SupervisorArguments = "-NoProfile -ExecutionPolicy Bypass -File `"$root\SshSupervisor.ps1`" -StatePath `"$supervisorState`""
+    Save-State $state
+    $taskIntent = Join-Path $root 'intent-supervisor-task.json'
+    Set-ResourceIntent -Path $taskIntent -Kind task -Identity $state.SupervisorTask -Marker $state.UserMarker
+    $supervisorAction = New-ScheduledTaskAction -Execute $state.SupervisorExecutable -Argument $state.SupervisorArguments
+    Register-ScheduledTask -TaskName $state.SupervisorTask -Action $supervisorAction -User 'SYSTEM' -RunLevel Highest | Out-Null
+    Set-ResourceApplied -Path $taskIntent -Identity $state.SupervisorTask
+    Start-ScheduledTask -TaskName $state.SupervisorTask
+    $startLimit = (Get-Date).AddSeconds(20)
+    while (-not (Test-Path -LiteralPath $ready) -and (Get-Date) -lt $startLimit) { Start-Sleep -Milliseconds 200 }
+    if (-not (Test-Path -LiteralPath $ready)) { throw 'Der ueberwachte SSH-Prozess meldete sich nicht rechtzeitig.' }
+    $processId = [int](Get-Content -LiteralPath $ready -Raw | ConvertFrom-Json).ProcessId
+    $process = Get-Process -Id $processId -ErrorAction Stop
     $state.ProcessId = $process.Id; $state.ProcessStart = $process.StartTime.ToUniversalTime().ToString('o'); Save-State $state
-    Start-Sleep -Seconds 2
-    if ($process.HasExited) { throw 'SSH-Server konnte nicht gestartet werden.' }
+    $mutex.ReleaseMutex(); $mutexHeld = $false
     Add-Type -AssemblyName System.Windows.Forms
     $fingerprint = (& "$env:WINDIR\System32\OpenSSH\ssh-keygen.exe" -lf "$key.pub") -join ' '
     [void][Windows.Forms.MessageBox]::Show("IP: $($selected.IP)`nBenutzer: $name`nPasswort: $password`nSSH: ssh -p $port $name@$($selected.IP)`nHostkey: $fingerprint`nAblauf: $expires`n`nPasswort wird nicht gespeichert.", 'Remote Help', 'OK', 'Information')
 } catch {
     Write-Warning "Einrichtung fehlgeschlagen: $($_.Exception.Message)"
-    try { Stop-RemoteHelp } catch { Write-Warning "Rueckbau fehlgeschlagen: $($_.Exception.Message). STOP_HIER erneut als Administrator ausfuehren." }
+    try {
+        if (-not $mutexHeld) {
+            try { $mutexHeld = $mutex.WaitOne() }
+            catch [System.Threading.AbandonedMutexException] { $mutexHeld = $true }
+        }
+        Stop-RemoteHelp
+    } catch { Write-Warning "Rueckbau fehlgeschlagen: $($_.Exception.Message). STOP_HIER erneut als Administrator ausfuehren." }
     throw
+}
+} finally {
+    if ($mutexHeld) { $mutex.ReleaseMutex() }
+    $mutex.Dispose()
 }

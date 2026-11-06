@@ -26,6 +26,12 @@ jobs:
         shell: powershell
     steps:
       - uses: actions/checkout@v4
+      - name: Install OpenSSH server for integration tests
+        run: |
+          $capability = Get-WindowsCapability -Online -Name 'OpenSSH.Server~~~~0.0.1.0'
+          if ($capability.State -ne 'Installed') {
+            Add-WindowsCapability -Online -Name $capability.Name -ErrorAction Stop | Out-Null
+          }
       - name: PowerShell 5.1, Pester and ScriptAnalyzer
         run: |
           if ($PSVersionTable.PSVersion.Major -ne 5) { throw 'Windows PowerShell 5.1 required' }
