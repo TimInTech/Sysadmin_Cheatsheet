@@ -77,7 +77,7 @@ $addresses = @(Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.IPAddres
     if ($adapter -and $adapter.Status -eq 'Up' -and $adapter.HardwareInterface -and ($parts[0] -eq 10 -or ($parts[0] -eq 172 -and $parts[1] -ge 16 -and $parts[1] -le 31) -or ($parts[0] -eq 192 -and $parts[1] -eq 168))) {
         $raw = [Net.IPAddress]::Parse($ip.IPAddress).GetAddressBytes(); [array]::Reverse($raw)
         $number = [BitConverter]::ToUInt32($raw,0)
-        $mask = [uint32]([uint64]0xffffffff -shl (32 - $ip.PrefixLength) -band [uint64]0xffffffff)
+        $mask = [uint32]([uint64]0xffffffffL -shl (32 - $ip.PrefixLength) -band [uint64]0xffffffffL)
         $networkBytes = [BitConverter]::GetBytes([uint32]($number -band $mask)); [array]::Reverse($networkBytes)
         [pscustomobject]@{ IP=$ip.IPAddress; Network=([Net.IPAddress]::new($networkBytes).ToString() + '/' + $ip.PrefixLength); Adapter=$adapter.Name }
     }
@@ -87,7 +87,7 @@ for ($i=0; $i -lt $addresses.Count; $i++) { Write-Host ("{0}) {1}: {2} ({3})" -f
 $selection = 0
 if (-not [int]::TryParse((Read-Host 'Netznummer'), [ref]$selection) -or $selection -lt 1 -or $selection -gt $addresses.Count) { throw 'Ungueltige Netznummer.' }
 $selected = $addresses[$selection-1]
-$mode = Read-Host '1 = temporaer (2 Stunden), 2 = dauerhaft'
+$mode = (Read-Host '1 = temporaer (2 Stunden), 2 = dauerhaft').Trim()
 if ($mode -notin @('1','2')) { throw 'Ungueltige Auswahl.' }
 $name = 'remotehelp'; $suffix = 0
 while (Get-LocalUser -Name $name -ErrorAction SilentlyContinue) { $suffix++; $name = "remotehelp$suffix"; if ($suffix -gt 99) { throw 'Kein freier Benutzername.' } }
@@ -141,15 +141,15 @@ try {
     $owner.sid = $newUser.SID.Value
     $owner | ConvertTo-Json | Set-Content -LiteralPath $ownerPath -Encoding UTF8
     $secure.Dispose()
-    $block = "`r`n$begin`r`nMatch User $name Address !$($selected.Network),*`r`n    DenyUsers $name`r`n    PasswordAuthentication no`r`n    PubkeyAuthentication no`r`nMatch User $name Address $($selected.Network)`r`n    PasswordAuthentication yes`r`n    PubkeyAuthentication no`r`n    PermitEmptyPasswords no`r`n$end`r`n"
+    $block = "`r`n$begin`r`nMatch User $name,.\$name Address !$($selected.Network),*`r`n    DenyUsers $name .\$name`r`n    PasswordAuthentication no`r`n    PubkeyAuthentication no`r`nMatch User $name,.\$name Address $($selected.Network)`r`n    PasswordAuthentication yes`r`n    PubkeyAuthentication no`r`n    PermitEmptyPasswords no`r`n$end`r`n"
     [IO.File]::AppendAllText($config, $block, [Text.Encoding]::ASCII)
     & $sshd -t
     if ($LASTEXITCODE -ne 0) { throw 'SSH-Konfiguration ungueltig.' }
-    $inside = & $sshd -T -C "user=$name,host=localhost,addr=$($selected.IP)"
+    $inside = & $sshd -T -C "user=.\$name,host=localhost,addr=$($selected.IP)"
     if ($LASTEXITCODE -ne 0 -or $inside -notcontains 'passwordauthentication yes') { throw 'Passwortanmeldung fuer das gewaehlte Netz nicht wirksam.' }
-    $outside = & $sshd -T -C "user=$name,host=localhost,addr=8.8.8.8"
+    $outside = & $sshd -T -C "user=.\$name,host=localhost,addr=8.8.8.8"
     if ($LASTEXITCODE -ne 0 -or $outside -notcontains "denyusers $name" -or $outside -notcontains 'passwordauthentication no' -or $outside -notcontains 'pubkeyauthentication no') { throw 'Zugang ausserhalb des gewaehlten Netzes nicht sicher gesperrt.' }
-    $outside6 = & $sshd -T -C "user=$name,host=localhost,addr=2001:db8::1"
+    $outside6 = & $sshd -T -C "user=.\$name,host=localhost,addr=2001:db8::1"
     if ($LASTEXITCODE -ne 0 -or $outside6 -notcontains "denyusers $name" -or $outside6 -notcontains 'passwordauthentication no' -or $outside6 -notcontains 'pubkeyauthentication no') { throw 'IPv6-Zugang nicht sicher gesperrt.' }
     $portLine = @($inside | Where-Object { $_ -match '^port [0-9]+$' } | Select-Object -First 1)
     if (-not $portLine.Count) { throw 'SSH-Port konnte nicht ermittelt werden.' }

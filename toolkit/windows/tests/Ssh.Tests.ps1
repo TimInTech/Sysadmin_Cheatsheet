@@ -17,13 +17,13 @@ Describe 'SSH starter' {
         if (-not $process.WaitForExit(15000)) { $process.Kill(); throw 'ssh-keygen timeout' }
         if ($process.ExitCode -ne 0) { throw 'ssh-keygen failed' }
         $config = Join-Path $TestDrive 'sshd_config'
-        @("HostKey $($key.Replace('\','/'))", 'Match User remotehelp Address !192.168.5.0/24,*', '    DenyUsers remotehelp', '    PasswordAuthentication no', '    PubkeyAuthentication no', 'Match User remotehelp Address 192.168.5.0/24', '    PasswordAuthentication yes', '    PubkeyAuthentication no', '    PermitEmptyPasswords no') | Set-Content -LiteralPath $config -Encoding ASCII
+        @("HostKey $($key.Replace('\','/'))", 'Match User remotehelp,.\remotehelp Address !192.168.5.0/24,*', '    DenyUsers remotehelp .\remotehelp', '    PasswordAuthentication no', '    PubkeyAuthentication no', 'Match User remotehelp,.\remotehelp Address 192.168.5.0/24', '    PasswordAuthentication yes', '    PubkeyAuthentication no', '    PermitEmptyPasswords no') | Set-Content -LiteralPath $config -Encoding ASCII
         & $ssh -t -f $config
         $LASTEXITCODE | Should -Be 0
-        $inside = & $ssh -T -f $config -C 'user=remotehelp,host=localhost,addr=192.168.5.3'
+        $inside = & $ssh -T -f $config -C 'user=.\remotehelp,host=localhost,addr=192.168.5.3'
         $inside | Should -Contain 'passwordauthentication yes'
         foreach ($address in @('192.168.6.3','2001:db8::1')) {
-            $outside = & $ssh -T -f $config -C "user=remotehelp,host=localhost,addr=$address"
+            $outside = & $ssh -T -f $config -C "user=.\remotehelp,host=localhost,addr=$address"
             $outside | Should -Contain 'denyusers remotehelp'
             $outside | Should -Contain 'passwordauthentication no'
             $outside | Should -Contain 'pubkeyauthentication no'
