@@ -29,7 +29,9 @@ chmod 700 "$test_dir/openssl" "$test_dir/systemctl"
 printf '1\n' | env PATH="$test_dir:$PATH" bash "$base/START_HIER.sh" > "$test_dir/start-output" 2> "$test_dir/start-error" &
 start_pid=$!
 cleanup() {
-  [[ -f $test_dir/hung-pid ]] && kill "$(cat "$test_dir/hung-pid")" 2>/dev/null || true
+  if [[ -f $test_dir/hung-pid ]]; then
+    kill "$(cat "$test_dir/hung-pid")" 2>/dev/null || true
+  fi
   kill "$start_pid" 2>/dev/null || true
 }
 trap cleanup EXIT

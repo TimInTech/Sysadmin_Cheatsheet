@@ -115,7 +115,11 @@ try {
         } until ($password -cmatch '[A-Z]' -and $password -cmatch '[a-z]' -and $password -match '[0-9]')
     } finally { $rng.Dispose() }
     $password += '!'
-    $user = New-LocalUser -Name $name -Password (ConvertTo-SecureString $password -AsPlainText -Force) -AccountExpires $expires -Description $state.UserMarker
+    $securePassword = New-Object Security.SecureString
+    foreach ($character in $password.ToCharArray()) { $securePassword.AppendChar($character) }
+    $securePassword.MakeReadOnly()
+    $user = New-LocalUser -Name $name -Password $securePassword -AccountExpires $expires -Description $state.UserMarker
+    $securePassword.Dispose()
     $state.UserName = $name; $state.UserSid = $user.SID.Value; Save-State $state
     $key = Join-Path $root 'ssh_host_ed25519_key'
     & "$env:WINDIR\System32\OpenSSH\ssh-keygen.exe" -q -t ed25519 -N '""' -f $key
