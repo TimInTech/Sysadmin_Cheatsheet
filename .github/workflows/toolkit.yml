@@ -3,7 +3,6 @@ on:
   push:
   pull_request:
   workflow_dispatch:
-
 jobs:
   linux:
     runs-on: ubuntu-latest
@@ -13,12 +12,11 @@ jobs:
         run: |
           find toolkit/linux -name '*.sh' -print0 | xargs -0 -n1 bash -n
           find toolkit/linux -name '*.sh' -print0 | xargs -0 shellcheck
-      - name: Unprivileged validation tests
+      - name: Test OpenSSH configuration
         run: |
-          bash toolkit/linux/tests/test-validation.sh
-          bash toolkit/linux/tests/test-expiry.sh
-          bash toolkit/linux/tests/test-nss.sh
-          bash toolkit/linux/tests/test-termination.sh
+          if ! command -v sshd; then sudo apt-get update && sudo apt-get install -y openssh-server; fi
+          sudo install -d -m 755 /run/sshd
+          bash toolkit/linux/tests/test-ssh-config.sh
   windows:
     runs-on: windows-2022
     timeout-minutes: 10
@@ -27,26 +25,16 @@ jobs:
         shell: powershell
     steps:
       - uses: actions/checkout@v4
-      - name: Install OpenSSH server for integration tests
+      - name: Install OpenSSH Server
         run: |
           $capability = Get-WindowsCapability -Online -Name 'OpenSSH.Server~~~~0.0.1.0'
-          if ($capability.State -ne 'Installed') {
-            Add-WindowsCapability -Online -Name $capability.Name -ErrorAction Stop | Out-Null
-          }
-      - name: Install isolated SSH test client
-        run: |
-          python -m venv "$env:RUNNER_TEMP\toolkit-ssh-test"
-          & "$env:RUNNER_TEMP\toolkit-ssh-test\Scripts\python.exe" -m pip install 'paramiko>=3.5,<5'
-          if ($LASTEXITCODE -ne 0) { throw 'Installation des Testclients fehlgeschlagen.' }
-          "TOOLKIT_TEST_PYTHON=$env:RUNNER_TEMP\toolkit-ssh-test\Scripts\python.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          if ($capability.State -ne 'Installed') { Add-WindowsCapability -Online -Name $capability.Name -ErrorAction Stop | Out-Null }
       - name: PowerShell 5.1, Pester and ScriptAnalyzer
         run: |
           if ($PSVersionTable.PSVersion.Major -ne 5) { throw 'Windows PowerShell 5.1 required' }
           Import-Module Pester -RequiredVersion 5.9.0 -Force
           Import-Module PSScriptAnalyzer -ErrorAction Stop
-          $errors = @(Get-ChildItem toolkit/windows -Recurse -Filter *.ps1 | ForEach-Object {
-            Invoke-ScriptAnalyzer -Path $_.FullName -Severity Error
-          })
+          $errors = @(Get-ChildItem toolkit/windows -Recurse -Filter *.ps1 | ForEach-Object { Invoke-ScriptAnalyzer -Path $_.FullName -Severity Error })
           $errors | Format-Table
           if ($errors.Count -gt 0) { throw 'PSScriptAnalyzer reported errors' }
           Invoke-Pester -Path toolkit/windows/tests -CI

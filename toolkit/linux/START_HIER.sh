@@ -1,243 +1,158 @@
 #!/usr/bin/env bash
 set -euo pipefail
-validate_network() {
-  python3 - "$1" <<'PY'
+config=/etc/ssh/sshd_config
+folder=/usr/local/lib/sysadmin-toolkit
+unit=/etc/systemd/system
+[[ $EUID == 0 ]] || { echo 'Bitte mit sudo ausführen.' >&2; exit 1; }
+[[ -d /run/systemd/system ]] || { echo 'Dieses Skript benötigt systemd.' >&2; exit 1; }
+stop_access() {
+  local entry user uid expected_uid gecos token marker begin end
+  [[ -f $folder/owner ]] || { echo 'Kein Toolkit-Zugang gefunden.'; return 0; }
+  read -r user token expected_uid < "$folder/owner"
+  [[ $user =~ ^remotehelp[0-9]*$ && $token =~ ^[0-9a-f]{32}$ ]] || { echo 'Toolkit-Metadaten ungültig.' >&2; return 1; }
+  marker="SysadminToolkit-$token"; begin="# BEGIN SYSADMIN TOOLKIT REMOTEHELP $token"; end="# END SYSADMIN TOOLKIT REMOTEHELP $token"
+  if entry=$(getent passwd "$user"); then
+    IFS=: read -r _ _ uid _ gecos _ _ <<< "$entry"
+    [[ $gecos == "$marker" && ( -z $expected_uid || $uid == "$expected_uid" ) ]] || { echo 'Benutzeridentität geändert; Konto bleibt erhalten.' >&2; return 1; }
+    passwd -l "$user" >/dev/null
+    userdel "$user" || { echo 'Konto konnte nicht entfernt werden. Offene Sitzungen beenden und STOP wiederholen.' >&2; return 1; }
+  fi
+  if [[ -f $config ]] && grep -Fxq "$begin" "$config"; then
+    [[ $(grep -Fxc "$begin" "$config") == 1 && $(grep -Fxc "$end" "$config") == 1 ]] || { echo 'SSH-Markierungen unvollständig; bitte manuell prüfen.' >&2; return 1; }
+    sed -i "/^$begin$/,/^$end$/d" "$config"
+    sshd -t
+    if systemctl is-active --quiet ssh.service; then
+      if [[ -f $folder/service-started ]]; then systemctl stop ssh.service; else systemctl reload ssh.service; fi
+    fi
+  fi
+  for file in "$unit/sysadmin-toolkit-stop.timer" "$unit/sysadmin-toolkit-stop.service"; do
+    [[ ! -e $file ]] || [[ $(head -n 1 "$file") == "# SysadminToolkit-$token" ]] || { echo "Fremde Unit bleibt erhalten: $file" >&2; return 1; }
+  done
+  if [[ -f $unit/sysadmin-toolkit-stop.timer ]]; then systemctl disable --now sysadmin-toolkit-stop.timer >/dev/null; fi
+  if [[ -f $unit/sysadmin-toolkit-stop.service ]]; then systemctl disable sysadmin-toolkit-stop.service >/dev/null; fi
+  if [[ -f $folder/service-enabled ]] && systemctl is-enabled --quiet ssh.service; then systemctl disable ssh.service >/dev/null; fi
+  rm -f "$unit/sysadmin-toolkit-stop.timer" "$unit/sysadmin-toolkit-stop.service"
+  systemctl daemon-reload
+  rm -f "$folder/owner" "$folder/START_HIER.sh" "$folder/service-started" "$folder/service-enabled"
+  rmdir "$folder" 2>/dev/null || true
+  echo 'Toolkit-Zugang entfernt. SSH-Dienst, Pakete und persönliche Dateien bleiben erhalten.'
+}
+if [[ ${1:-} == --stop ]]; then stop_access; exit; fi
+[[ $# == 0 ]] || { echo 'Aufruf: sudo bash START_HIER.sh' >&2; exit 1; }
+if [[ -e $folder || -e $unit/sysadmin-toolkit-stop.timer || -e $unit/sysadmin-toolkit-stop.service ]] || { [[ -f $config ]] && grep -Fq '# BEGIN SYSADMIN TOOLKIT REMOTEHELP' "$config"; }; then
+  echo 'Ein Toolkit-Zugang existiert bereits. Erst STOP_HIER.sh ausführen.' >&2; exit 1
+fi
+for command in python3 ip systemctl; do command -v "$command" >/dev/null || { echo "$command fehlt." >&2; exit 1; }; done
+if ! command -v sshd >/dev/null; then
+  command -v apt-get >/dev/null || { echo 'apt-get fehlt.' >&2; exit 1; }
+  apt-get update
+  DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server
+fi
+if grep -Eiq '^[[:space:]]*Match[[:space:]]+' "$config" ||
+   grep -Ei '^[[:space:]]*Include[[:space:]]+' "$config" | grep -Ev '^[[:space:]]*Include[[:space:]]+/etc/ssh/sshd_config\.d/\*\.conf[[:space:]]*$' >/dev/null ||
+   grep -Eiq '^[[:space:]]*(Match|Include)[[:space:]]+' /etc/ssh/sshd_config.d/*.conf 2>/dev/null; then
+  echo 'Bestehende Match-/Include-Regeln bitte vor der Einrichtung manuell prüfen.' >&2
+  exit 1
+fi
+mapfile -t choices < <(ip -o -4 addr show scope global | awk '{print $2, $4}')
+networks=()
+for item in "${choices[@]}"; do
+  dev=${item%% *}; cidr=${item#* }
+  [[ -e /sys/class/net/$dev/device ]] || continue
+  if network=$(python3 - "$cidr" <<'PY'
 import ipaddress, sys
 try:
-    iface = ipaddress.IPv4Interface(sys.argv[1])
-    allowed = [ipaddress.IPv4Network(x) for x in ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16')]
-    if iface.network.prefixlen < 16 or not any(iface.network.subnet_of(x) for x in allowed):
+    interface = ipaddress.IPv4Interface(sys.argv[1])
+    allowed = [ipaddress.ip_network(n) for n in ('10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16')]
+    if not 16 <= interface.network.prefixlen <= 30 or not any(interface.network.subnet_of(n) for n in allowed):
         raise ValueError()
-    print(iface.ip, iface.network)
+    print(interface.ip, interface.network)
 except ValueError:
     sys.exit(1)
 PY
-}
-if [[ ${1:-} == --check-network ]]; then validate_network "${2:-}"; exit; fi
-if [[ ${1:-} == --check-expiry ]]; then
-  [[ ${2:-} =~ ^[0-9]+$ ]] && (( $(date +%s) < $2 )); exit
-fi
-[[ $# == 0 ]] || { echo 'Aufruf: sudo bash START_HIER.sh' >&2; exit 1; }
-[[ $EUID == 0 ]] || { echo 'Bitte mit sudo starten.' >&2; exit 1; }
-[[ -d /run/systemd/system ]] || { echo 'systemd ist erforderlich.' >&2; exit 1; }
-command -v flock >/dev/null || { echo 'flock fehlt.' >&2; exit 1; }
-lockdir=/run/lock/portable-sysadmin-ssh
-mkdir -m 700 "$lockdir" 2>/dev/null || true
-[[ -d $lockdir && ! -L $lockdir && $(stat -c '%u:%a' "$lockdir") == 0:700 && ! -L $lockdir/lock ]] || { echo 'Unsicherer Lock-Pfad.' >&2; exit 1; }
-exec 9>"$lockdir/lock"
-flock -x 9
-state=/var/lib/portable-sysadmin-ssh
-runtime=/run/portable-sysadmin-ssh
-unit=/etc/systemd/system
-for path in "$state" "$runtime" "$unit/portable-sysadmin-ssh.service" "$unit/portable-sysadmin-stop.service" "$unit/portable-sysadmin-cleanup.service" "$unit/portable-sysadmin-stop.timer" "$unit/portable-sysadmin-boot-cleanup.service"; do
-  [[ ! -e $path && ! -L $path ]] || { echo "Bereits vorhanden: $path. Erst STOP ausführen." >&2; exit 1; }
+  ); then networks+=("$dev $network"); fi
 done
-for cmd in python3 ip systemctl ssh-keygen openssl ss getent; do
-  command -v "$cmd" >/dev/null || { echo "$cmd fehlt; bitte zuerst installieren." >&2; exit 1; }
-done
-policy_marker='# portable-sysadmin temporary mount target; not executable'
-if [[ -f /usr/sbin/policy-rc.d && ! -L /usr/sbin/policy-rc.d && $(stat -c '%u:%a' /usr/sbin/policy-rc.d) == 0:644 && $(cat /usr/sbin/policy-rc.d) == "$policy_marker" ]]; then
-  rm -- /usr/sbin/policy-rc.d
-fi
-if ! command -v sshd >/dev/null; then
-  for cmd in apt-get unshare mount; do
-    command -v "$cmd" >/dev/null || { echo "$cmd fehlt." >&2; exit 1; }
-  done
-  if systemctl cat ssh.service >/dev/null 2>&1 || systemctl cat ssh.socket >/dev/null 2>&1 || [[ -e /usr/sbin/policy-rc.d || -L /usr/sbin/policy-rc.d ]]; then
-    echo 'Vorhandene SSH-Diensteinrichtung oder policy-rc.d: Installation abgebrochen.' >&2; exit 1
-  fi
-  echo 'OpenSSH-Server wird installiert; sein Standarddienst bleibt deaktiviert.'
-  install_tmp=$(mktemp -d /run/portable-ssh-install.XXXXXXXX)
-  printf '#!/bin/sh\nexit 101\n' > "$install_tmp/policy"
-  chmod 700 "$install_tmp/policy"
-  # The host sees only a non-executable placeholder; the policy is mounted only for apt.
-  (umask 022; set -o noclobber; printf '%s\n' "$policy_marker" > /usr/sbin/policy-rc.d) || { echo 'policy-rc.d bereits vorhanden.' >&2; exit 1; }
-  chmod 644 /usr/sbin/policy-rc.d
-  policy_id=$(stat -c '%d:%i' /usr/sbin/policy-rc.d)
-  cleanup_install() {
-    if [[ -f /usr/sbin/policy-rc.d && $(stat -c '%d:%i' /usr/sbin/policy-rc.d) == "$policy_id" && $(cat /usr/sbin/policy-rc.d) == "$policy_marker" ]]; then rm -f /usr/sbin/policy-rc.d; fi
-    rm -f "$install_tmp/policy"
-    rmdir "$install_tmp" 2>/dev/null || true
-  }
-  trap cleanup_install EXIT
-  trap 'exit 1' INT TERM
-  # shellcheck disable=SC2016
-  if ! unshare --mount --propagation private bash -c 'set -e; mount --bind "$1" /usr/sbin/policy-rc.d; apt-get update; DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server' -- "$install_tmp/policy"; then
-    echo 'OpenSSH-Installation fehlgeschlagen.' >&2; exit 1
-  fi
-  systemctl disable --now ssh.service ssh.socket >/dev/null 2>&1 || true
-  cleanup_install
-  trap - EXIT INT TERM
-fi
-[[ -f /etc/pam.d/sshd && -f /etc/ssh/ssh_host_ed25519_key ]] || { echo 'OpenSSH-PAM-Konfiguration oder Hostschlüssel fehlt.' >&2; exit 1; }
-mapfile -t candidates < <(ip -o -4 addr show scope global | awk '{print $2, $4}')
-choices=()
-for candidate in "${candidates[@]}"; do
-  dev=${candidate%% *}; cidr=${candidate#* }
-  [[ $dev != tun* && $dev != tap* && $dev != wg* && $dev != tailscale* && $dev != docker* && $dev != br-* && $dev != veth* ]] || continue
-  [[ -e /sys/class/net/$dev/device ]] || continue
-  if validate_network "$cidr" >/dev/null; then choices+=("$candidate"); fi
-done
-((${#choices[@]})) || { echo 'Keine geeignete private Netzwerkschnittstelle gefunden.' >&2; exit 1; }
-printf 'Lokales Netzwerk auswählen:\n'
-for i in "${!choices[@]}"; do printf '%s) %s\n' "$((i+1))" "${choices[$i]}"; done
-read -r -p 'Nummer: ' selection
-if [[ ! $selection =~ ^[0-9]+$ ]] || ((selection < 1 || selection > ${#choices[@]})); then echo 'Ungültige Auswahl.' >&2; exit 1; fi
-candidate=${choices[$((selection-1))]}; dev=${candidate%% *}; cidr=${candidate#* }
-read -r address network < <(validate_network "$cidr")
-username=remotehelp
-if getent passwd "$username" >/dev/null; then username="remotehelp$(python3 -c 'import secrets; print(secrets.token_hex(3))')"; fi
-getent passwd "$username" >/dev/null && { echo 'Benutzername belegt.' >&2; exit 1; }
-port=22222
-if ss -H -ltn "sport = :$port" | grep -q .; then echo "Port $port ist bereits belegt." >&2; exit 1; fi
-# Reserve identity metadata before account creation; a random GECOS marker prevents deletion of replacements.
-marker=$(python3 -c 'import secrets; print(secrets.token_hex(16))')
-uid=$(python3 - <<'PYUID'
-import pathlib, pwd
-used = {p.pw_uid for p in pwd.getpwall()}
-for proc in pathlib.Path('/proc').iterdir():
-    if not proc.name.isdigit():
-        continue
-    try:
-        lines = (proc / 'status').read_text().splitlines()
-    except FileNotFoundError:
-        continue
-    uid_line = next((line for line in lines if line.startswith('Uid:')), None)
-    if uid_line is None:
-        raise RuntimeError('Process UID unavailable')
-    used.update(map(int, uid_line.split()[1:]))
-print(next(i for i in range(2000, 60000) if i not in used))
-PYUID
-)
-scriptdir=$(dirname "$(readlink -f "$0")")
-"$scriptdir/UID_GUARD.sh" --available "$uid" "$username" || { echo 'UID-Sicherheit nicht nachweisbar; Einrichtung abgebrochen.' >&2; exit 1; }
-expiry=$(($(date +%s)+7200))
-mkdir -m 700 "$state" "$runtime"
-trap 'PORTABLE_SSH_LOCK_HELD=1 "$state/stop.sh" --rollback || true' ERR
-trap 'PORTABLE_SSH_LOCK_HELD=1 "$state/stop.sh" --rollback || true; exit 1' INT TERM
-cp "$(dirname "$(readlink -f "$0")")/STOP_HIER.sh" "$state/stop.sh"
-chmod 700 "$state/stop.sh"
-cp "$(dirname "$(readlink -f "$0")")/DEADLINE.sh" "$state/deadline.sh"
-chmod 700 "$state/deadline.sh"
-cp "$scriptdir/UID_GUARD.sh" "$state/uid-guard.sh"
-cp "$scriptdir/TERMINATE_USER.sh" "$state/terminate-user.sh"
-chmod 700 "$state/uid-guard.sh" "$state/terminate-user.sh"
-printf '%s\n' "$username" > "$state/user"
-printf '%s\n' "$uid" > "$state/uid"
-printf '%s\n' "$marker" > "$state/marker"
-printf '%s\n' "$expiry" > "$state/expiry"
-cat > "$state/check-expiry.sh" <<'CHECK'
-#!/usr/bin/env bash
-set -euo pipefail
-expiry=$(cat /var/lib/portable-sysadmin-ssh/expiry)
-[[ $expiry =~ ^[0-9]+$ ]] && (( $(date +%s) < expiry ))
-CHECK
-chmod 700 "$state/check-expiry.sh"
-target=$(date -d "@$expiry" '+%Y-%m-%d %H:%M:%S')
-cat > "$unit/portable-sysadmin-stop.service" <<SERVICE
-# portable-sysadmin $marker
+((${#networks[@]})) || { echo 'Kein geeignetes physisches privates IPv4-Netz gefunden.' >&2; exit 1; }
+for i in "${!networks[@]}"; do printf '%s) %s\n' "$((i+1))" "${networks[$i]}"; done
+read -r -p 'Netznummer: ' selection
+if [[ ! $selection =~ ^[0-9]+$ ]] || ((selection < 1 || selection > ${#networks[@]})); then echo 'Ungültige Auswahl.' >&2; exit 1; fi
+read -r dev address network <<< "${networks[$((selection-1))]}"
+read -r -p '1 = temporär (2 Stunden), 2 = dauerhaft: ' mode
+[[ $mode == 1 || $mode == 2 ]] || { echo 'Ungültige Auswahl.' >&2; exit 1; }
+name=remotehelp; suffix=0
+while getent passwd "$name" >/dev/null; do suffix=$((suffix+1)); name="remotehelp$suffix"; ((suffix <= 99)) || { echo 'Kein freier Benutzername.' >&2; exit 1; }; done
+[[ ! -e /home/$name ]] || { echo 'Das vorgesehene Homeverzeichnis existiert bereits.' >&2; exit 1; }
+token=$(python3 -c 'import secrets; print(secrets.token_hex(16))')
+marker="SysadminToolkit-$token"; begin="# BEGIN SYSADMIN TOOLKIT REMOTEHELP $token"; end="# END SYSADMIN TOOLKIT REMOTEHELP $token"
+password=$(python3 -c 'import secrets,string; print("".join(secrets.choice(string.ascii_letters+string.digits) for _ in range(20))+"aA1!")')
+install -d -m 700 "$folder"
+printf '%s %s\n' "$name" "$token" > "$folder/owner"
+install -m 700 "$0" "$folder/START_HIER.sh"
+trap 'stop_access || echo "Rückbau fehlgeschlagen: STOP_HIER.sh erneut ausführen." >&2' ERR
+useradd -m -c "$marker" -s /bin/bash "$name"
+printf '%s %s %s\n' "$name" "$token" "$(id -u "$name")" > "$folder/owner"
+cat >> "$config" <<CONFIG
+
+$begin
+Match User $name Address !$network,*
+    DenyUsers $name
+    PasswordAuthentication no
+    PubkeyAuthentication no
+    KbdInteractiveAuthentication no
+Match User $name Address $network
+    PasswordAuthentication yes
+    PubkeyAuthentication no
+    KbdInteractiveAuthentication no
+    PermitEmptyPasswords no
+$end
+CONFIG
+install -d -m 755 /run/sshd
+sshd -t
+inside=$(sshd -T -C "user=$name,host=localhost,addr=$address")
+outside=$(sshd -T -C "user=$name,host=localhost,addr=8.8.8.8")
+outside6=$(sshd -T -C "user=$name,host=localhost,addr=2001:db8::1")
+grep -Fxq 'passwordauthentication yes' <<< "$inside" || { echo 'Passwortanmeldung im LAN nicht wirksam.' >&2; false; }
+if ! grep -Fxq "denyusers $name" <<< "$outside" || ! grep -Fxq 'passwordauthentication no' <<< "$outside" || ! grep -Fxq 'pubkeyauthentication no' <<< "$outside" || ! grep -Fxq 'kbdinteractiveauthentication no' <<< "$outside"; then echo 'Zugang außerhalb des LAN nicht sicher gesperrt.' >&2; false; fi
+if ! grep -Fxq "denyusers $name" <<< "$outside6" || ! grep -Fxq 'passwordauthentication no' <<< "$outside6" || ! grep -Fxq 'pubkeyauthentication no' <<< "$outside6" || ! grep -Fxq 'kbdinteractiveauthentication no' <<< "$outside6"; then echo 'IPv6-Zugang nicht sicher gesperrt.' >&2; false; fi
+port=$(awk '$1 == "port" { print $2; exit }' <<< "$inside")
+[[ $port =~ ^[0-9]+$ ]] || { echo 'SSH-Port konnte nicht ermittelt werden.' >&2; false; }
+if [[ $mode == 1 ]]; then
+  target=$(date -d '+2 hours' '+%Y-%m-%d %H:%M:%S')
+  cat > "$unit/sysadmin-toolkit-stop.service" <<SERVICE
+# SysadminToolkit-$token
 [Unit]
-Description=Immediately revoke expired Portable Sysadmin SSH access
-StartLimitIntervalSec=0
-[Service]
-Type=oneshot
-ExecCondition=/usr/bin/test -x $state/deadline.sh
-ExecStart=$state/deadline.sh
-Restart=on-failure
-RestartSec=5s
-SERVICE
-cat > "$unit/portable-sysadmin-cleanup.service" <<SERVICE
-# portable-sysadmin $marker
-[Unit]
-Description=Remove expired Portable Sysadmin SSH resources
-After=portable-sysadmin-stop.service
-StartLimitIntervalSec=0
-[Service]
-Type=oneshot
-ExecStart=$state/stop.sh --timer
-TimeoutStartSec=30s
-Restart=on-failure
-RestartSec=5s
-SERVICE
-cat > "$unit/portable-sysadmin-stop.timer" <<TIMER
-# portable-sysadmin $marker
-[Unit]
-Description=Expire Portable Sysadmin SSH access
-[Timer]
-OnCalendar=$target
-Persistent=true
-AccuracySec=1s
-[Install]
-WantedBy=timers.target
-TIMER
-cat > "$unit/portable-sysadmin-boot-cleanup.service" <<SERVICE
-# portable-sysadmin $marker
-[Unit]
-Description=Remove interrupted Portable Sysadmin access after boot
+Description=Remove Sysadmin Toolkit SSH access
 After=local-fs.target
+Before=ssh.service ssh.socket
 [Service]
 Type=oneshot
-ExecStart=$state/stop.sh --boot
+ExecStart=$folder/START_HIER.sh --stop
 [Install]
 WantedBy=multi-user.target
 SERVICE
-systemctl daemon-reload
-systemctl enable --now portable-sysadmin-stop.timer >/dev/null
-systemctl enable portable-sysadmin-boot-cleanup.service >/dev/null
-# The real account remains password-locked, so other daemons cannot use this password.
-useradd -M -N -g nogroup -u "$uid" -c "portable-sysadmin-$marker" -d /nonexistent -s /bin/bash "$username"
-"$state/uid-guard.sh" --owned "$uid" "$username" || { echo 'UID-Sicherheit nicht nachweisbar.' >&2; false; }
-"$state/uid-guard.sh" --no-processes "$uid" "$username" || { echo 'Fremde Prozesse mit dieser UID vorhanden.' >&2; false; }
-printf '%s\n' "$marker" > "$state/processes-armed"
-password=$(python3 -c 'import secrets,string; print("".join(secrets.choice(string.ascii_letters+string.digits) for _ in range(20)))')
-hash=$(printf '%s\n' "$password" | openssl passwd -6 -stdin)
-printf '%s:%s:20000:0:99999:7:::\n' "$username" "$hash" > "$runtime/shadow"
-chmod 600 "$runtime/shadow"
-printf 'account requisite pam_exec.so quiet %s/check-expiry.sh\n' "$state" > "$runtime/pam"
-cat /etc/pam.d/sshd >> "$runtime/pam"
-chmod 600 "$runtime/pam"
-cat > "$runtime/sshd_config" <<CONFIG
-Port $port
-ListenAddress $address
-PidFile $runtime/sshd.pid
-HostKey /etc/ssh/ssh_host_ed25519_key
-PasswordAuthentication yes
-PubkeyAuthentication no
-KbdInteractiveAuthentication no
-UsePAM yes
-PermitRootLogin no
-PermitEmptyPasswords no
-AllowUsers $username@$network
-AllowTcpForwarding no
-AllowAgentForwarding no
-X11Forwarding no
-PermitTunnel no
-CONFIG
-install -d -m 755 /run/sshd
-sshd -t -f "$runtime/sshd_config"
-cat > "$unit/portable-sysadmin-ssh.service" <<SERVICE
-# portable-sysadmin $marker
+  cat > "$unit/sysadmin-toolkit-stop.timer" <<TIMER
+# SysadminToolkit-$token
 [Unit]
-Description=Portable Sysadmin temporary SSH
-After=network-online.target
-Wants=network-online.target
-[Service]
-Type=simple
-PrivateMounts=yes
-BindReadOnlyPaths=$runtime/shadow:/etc/shadow
-BindReadOnlyPaths=$runtime/pam:/etc/pam.d/sshd
-ExecStartPre=$state/check-expiry.sh
-ExecStart=/usr/sbin/sshd -D -e -f $runtime/sshd_config
-SERVICE
-systemctl daemon-reload
-"$state/check-expiry.sh" || { echo 'Einrichtung dauerte zu lange; Zugang abgelaufen.' >&2; false; }
-systemctl start portable-sysadmin-ssh.service
-sleep 1
-systemctl is-active --quiet portable-sysadmin-ssh.service
-"$state/check-expiry.sh" || { echo 'Zugang bereits abgelaufen.' >&2; false; }
-trap - ERR INT TERM
-printf '\nAdresse: %s\nBenutzer: %s\nPasswort: %s\nSSH: ssh -p %s %s@%s\n' "$address" "$username" "$password" "$port" "$username" "$address"
-printf 'Ablauf: %s. Nach einem Neustart wird der Zugang beendet.\n' "$(date -d "@$expiry")"
-printf 'Das Netz %s auf %s ist zugelassen. Vorhandene Firewalls können den Port blockieren.\n' "$network" "$dev"
-echo 'In dieser Sitzung funktionieren Wechsel zu anderen lokalen Konten sowie sudo-Passwortprüfungen wegen der isolierten Kontodaten nicht wie gewohnt.'
-unset password hash
+Description=Expire Sysadmin Toolkit SSH access
+[Timer]
+OnCalendar=$target
+OnBootSec=1min
+Persistent=true
+[Install]
+WantedBy=timers.target
+TIMER
+  systemctl daemon-reload
+  systemctl enable sysadmin-toolkit-stop.service >/dev/null
+  systemctl enable --now sysadmin-toolkit-stop.timer >/dev/null
+fi
+if [[ $mode == 2 ]] && ! systemctl is-enabled --quiet ssh.service && ! systemctl is-enabled --quiet ssh.socket; then
+  : > "$folder/service-enabled"
+  systemctl enable ssh.service >/dev/null
+fi
+if systemctl is-active --quiet ssh.service; then systemctl reload ssh.service; else : > "$folder/service-started"; systemctl start ssh.service; fi
+printf '%s:%s\n' "$name" "$password" | chpasswd
+trap - ERR
+printf '\nIP: %s\nBenutzer: %s\nPasswort: %s\nSSH-Befehl: ssh -p %s %s@%s\n' "$address" "$name" "$password" "$port" "$name" "$address"
+[[ $mode != 1 ]] || echo "Ablauf: $target; nach Neustart erfolgt der Rückbau früher."
+echo "Zugriff nur aus $network; vorhandene Firewall kann Port $port blockieren."
+unset password
