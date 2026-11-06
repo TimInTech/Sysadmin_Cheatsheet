@@ -177,6 +177,10 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[ChatGPT-Promptvorlagen](09_KI_CLI_Slash-Befehle/ChatGPT%20Slash-Promptvorlagen.md)**
   96 technische Promptvorlagen für Linux, Windows, Netzwerk, Homelab, Git, Code und IT-Sicherheit.
 
+### 🌐 13. Remotezugriff
+- **[01 RDP, VNC, Tailscale, WireGuard und Wake-on-LAN](13_Remotezugriff/01_RDP_VNC_Tailscale_WireGuard_und_WoL.md)**
+  Bildschirm-Fernzugriff, VPN ohne Portfreigabe, eigenes WireGuard-VPN und Rechner per Netzwerk einschalten.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
