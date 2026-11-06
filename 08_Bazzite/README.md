@@ -31,7 +31,7 @@ Am einfachsten: **Bazaar** öffnen, App suchen und auf **Installieren** klicken.
 Diese Programme sind fürs Gaming nützlich:
 
 | Zweck | App |
-|---|---|
+| --- | --- |
 | Epic Games, GOG und Amazon Games | Heroic Games Launcher |
 | Zusätzliche Proton-Versionen | ProtonPlus |
 | Chat mit Freunden | Discord |
