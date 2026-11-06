@@ -187,6 +187,10 @@ Willkommen im ultimativen, strukturierten Nachschlagewerk für die Administratio
 - **[01 Checkliste Windows und Ubuntu](11_Ersteinrichtung/01_Checkliste_Windows_und_Ubuntu.md)**
   Feste Reihenfolge nach der Neuinstallation: Updates, Treiber, Sicherheit, Programme, Backup. Dazu die winget-Paketliste [programme.winget.json](11_Ersteinrichtung/programme.winget.json) zum Importieren.
 
+### 15. Drucker und Scanner
+- **[01 Drucker und Scanner: CUPS und Windows](15_Drucker_und_Scanner/01_Drucker_und_Scanner_CUPS_und_Windows.md)**
+  Netzwerkdrucker treiberlos einrichten, Druckaufträge steuern, hängende Warteschlange lösen, Scanner mit SANE und unter Windows.
+
 ---
 
 > Die Sammlung wird laufend erweitert und gepflegt. Fokus liegt auf schnellen, effizienten Kommandozeilenbefehlen für den Notfall.
