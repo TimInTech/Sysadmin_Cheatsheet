@@ -26,7 +26,7 @@ sudo ./Ventoy2Disk.sh -u /dev/sdX
 
 ## 2. Essenzielle ISOs für den Rettungs-Stick
 
-Folgende ISO-Dateien sollten auf keinem Admin-Stick fehlen:
+Folgende ISO-Dateien sollten auf keinem Admin-Stick fehlen: Die Download-Links stehen in [04 Download-Links](04_Download_Links.md).
 
 1. **SystemRescue (ehemals SystemRescueCd):**
    Das Schweizer Taschenmesser. Beinhaltet GParted, ddrescue, TestDisk, Netzwerkanalysetools und Chroot-Umgebungen. Basierend auf Arch Linux.
