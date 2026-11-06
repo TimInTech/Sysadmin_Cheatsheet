@@ -27,6 +27,8 @@ Describe 'Windows OpenSSH password and session integration' {
             $probe.Start(); $port = $probe.LocalEndpoint.Port; $probe.Stop()
             $config = Join-Path $TestDrive 'login_sshd_config'
             @("Port $port", 'ListenAddress 127.0.0.1', "HostKey `"$($key.Replace('\','/'))`"", "AllowUsers $userName@127.0.0.1", 'PasswordAuthentication yes', 'PubkeyAuthentication no', 'PermitEmptyPasswords no') | Set-Content -LiteralPath $config -Encoding ASCII
+            & $exe -t -f $config
+            if ($LASTEXITCODE -ne 0) { throw "Test-SSH-Konfiguration ungueltig: $LASTEXITCODE" }
             $state = Join-Path $TestDrive 'login-supervisor.json'
             $ready = Join-Path $TestDrive 'login-supervisor-ready.json'
             Write-AtomicState -Path $state -State @{ Executable=$exe; Arguments="-D -f `"$config`""; DeadlineUtc=[DateTime]::UtcNow.AddSeconds(35).ToString('o'); ReadyPath=$ready }
@@ -47,7 +49,11 @@ Describe 'Windows OpenSSH password and session integration' {
             if ($client.ExitCode -ne 0) {
                 $message = Get-Content -LiteralPath $err -Raw
                 if ($message) { $message = $message.Replace($password, '[REDACTED]') }
-                throw ('SSH-Anmeldetest fehlgeschlagen: ' + $message)
+                $taskInfo = Get-ScheduledTaskInfo -TaskName $taskName -ErrorAction SilentlyContinue
+                $taskState = (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue).State
+                $readyExists = Test-Path -LiteralPath $ready
+                $listenerExists = [bool](Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue)
+                throw ("SSH-Test fehlgeschlagen; Task=$taskState Result=$($taskInfo.LastTaskResult) Ready=$readyExists Listener=$listenerExists; " + $message)
             }
             $output = Get-Content -LiteralPath $out -Raw
             $output | Should -Match 'AUTH_AND_SESSION_OK'
