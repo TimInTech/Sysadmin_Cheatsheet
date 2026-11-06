@@ -63,7 +63,6 @@ Für Server und Rechner mit Dauerbetrieb die **LTS**-Variante von Ubuntu wählen
 | **Memtest86+** | Arbeitsspeicher testen | <https://memtest.org/> |
 
 - **Hiren's BootCD PE** und **Medicat** sind keine Microsoft-Produkte. Sie enthalten Programme von Drittanbietern. Nur von der verlinkten Projektseite laden und die Prüfsumme vergleichen.
-- Welches dieser Pakete gemeint war, wenn von „dem großen Windows-Reparaturstick, der vom Linux-Stick bootet“ die Rede ist, wurde nicht geklärt: Medicat passt am ehesten.
 - Die eingebaute Windows-Reparaturumgebung beschreibt [03 Windows RE](03_Windows_RE.md).
 
 ## 5. Sicherheits- und Pentesting-Systeme
