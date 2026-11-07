@@ -31,7 +31,7 @@ Im Ordner `windows\zusatz` liegen kleine Programme, die einen Bericht im Fenster
 1. OpenSSH-Server fehlt → wird nachgeladen (Internet nötig)
 2. Hostschlüssel fehlt → wird erzeugt
 3. SSH-Konfiguration fehlt oder ist fehlerhaft → die alte Datei wird gesichert, die Windows-Standardkonfiguration eingesetzt
-4. `administrators_authorized_keys` hat zu offene Rechte → Rechte werden wie von Microsoft beschrieben beschränkt
+4. `administrators_authorized_keys` erlaubt anderen Konten das Schreiben → Rechte werden wie von Microsoft beschrieben beschränkt
 5. SSH-Dienst deaktiviert oder gestoppt → wird auf „Manuell“ gestellt bzw. gestartet
 6. Reste eines abgebrochenen `START_HIER` → werden entfernt
 

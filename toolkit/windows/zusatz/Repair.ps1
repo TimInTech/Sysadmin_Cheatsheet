@@ -35,12 +35,19 @@ function Get-SshCapabilityState { (Get-WindowsCapability -Online -Name 'OpenSSH.
 function Get-SshServiceInfo { Get-CimInstance Win32_Service -Filter "Name='sshd'" -ErrorAction SilentlyContinue }
 function Test-SshConfigValid([string]$Sshd) { & $Sshd -t 2>&1 | Out-Null; return ($LASTEXITCODE -eq 0) }
 function Test-AdminKeysAcl([string]$Path) {
-    # OpenSSH ignores administrators_authorized_keys unless only Administrators and SYSTEM have access.
+    # Mirrors Win32-OpenSSH check_secure_file_permission (w32-sshfileperm.c): no principal other
+    # than Administrators, SYSTEM or TrustedInstaller may hold a write-class right; read-only
+    # entries are tolerated.
+    $trusted = @('S-1-5-32-544', 'S-1-5-18', 'S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464')
+    # WriteData, AppendData, WriteExtendedAttributes, WriteAttributes, Delete, ChangePermissions,
+    # TakeOwnership plus GENERIC_WRITE and GENERIC_ALL.
+    $writeMask = 0x2 -bor 0x4 -bor 0x10 -bor 0x100 -bor 0x10000 -bor 0x40000 -bor 0x80000 -bor 0x40000000 -bor 0x10000000
     $acl = Get-Acl -LiteralPath $Path
-    if (-not $acl.AreAccessRulesProtected) { return $false }
     foreach ($entry in $acl.Access) {
+        if ($entry.AccessControlType -ne 'Allow') { continue }
         $sid = $entry.IdentityReference.Translate([Security.Principal.SecurityIdentifier]).Value
-        if ($sid -notin @('S-1-5-32-544', 'S-1-5-18')) { return $false }
+        if ($sid -in $trusted) { continue }
+        if (([int64]$entry.FileSystemRights -band $writeMask) -ne 0) { return $false }
     }
     return $true
 }
@@ -85,7 +92,7 @@ function Get-SshFindings {
     } else { $findings.Add((New-SshFinding 'Konfiguration' $true 'SSH-Konfiguration ist fehlerfrei.')) }
 
     if ((Test-Path -LiteralPath $p.AdminKeys) -and -not (Test-AdminKeysAcl $p.AdminKeys)) {
-        $findings.Add((New-SshFinding 'Schluesseldatei der Administratoren' $false 'administrators_authorized_keys hat zu offene Rechte; SSH ignoriert die Datei dann und Schluessel-Anmeldungen von Administratoren scheitern. Behebung: Rechte auf Administratoren und SYSTEM beschraenken (wie von Microsoft beschrieben).' {
+        $findings.Add((New-SshFinding 'Schluesseldatei der Administratoren' $false 'administrators_authorized_keys erlaubt anderen Konten das Schreiben; SSH ignoriert die Datei dann und Schluessel-Anmeldungen von Administratoren scheitern. Behebung: Rechte auf Administratoren und SYSTEM beschraenken (wie von Microsoft beschrieben).' {
             & "$env:WINDIR\System32\icacls.exe" $p.AdminKeys /inheritance:r /grant '*S-1-5-32-544:F' /grant '*S-1-5-18:F' | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "icacls meldet Fehlercode $LASTEXITCODE." }
         }.GetNewClosure()))

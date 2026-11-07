@@ -149,12 +149,20 @@ Describe 'SSH repair' {
         $left.Count | Should -Be 1
         $left[0].Fix | Should -Not -BeNullOrEmpty
     }
-    It 'accepts administrators_authorized_keys only with Administrators and SYSTEM' -Skip:($env:OS -ne 'Windows_NT') {
+    It 'judges administrators_authorized_keys like OpenSSH (write rights only for Administrators and SYSTEM)' -Skip:($env:OS -ne 'Windows_NT') {
         $file = Join-Path $TestDrive 'administrators_authorized_keys'
         Set-Content -LiteralPath $file -Value 'ssh-ed25519 AAAA test'
+        # The test user holds write rights through inheritance.
         Test-AdminKeysAcl $file | Should -BeFalse
         & "$env:WINDIR\System32\icacls.exe" $file /inheritance:r /grant '*S-1-5-32-544:F' /grant '*S-1-5-18:F' | Out-Null
         $LASTEXITCODE | Should -Be 0
+        $after = Test-AdminKeysAcl $file
+        if (-not $after) { & "$env:WINDIR\System32\icacls.exe" $file | Out-Host }
+        $after | Should -BeTrue
+        # Read-only access for Users is tolerated by OpenSSH.
+        & "$env:WINDIR\System32\icacls.exe" $file /grant '*S-1-5-32-545:R' | Out-Null
         Test-AdminKeysAcl $file | Should -BeTrue
+        & "$env:WINDIR\System32\icacls.exe" $file /grant '*S-1-5-32-545:M' | Out-Null
+        Test-AdminKeysAcl $file | Should -BeFalse
     }
 }
