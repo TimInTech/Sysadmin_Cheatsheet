@@ -152,10 +152,10 @@ Describe 'SSH repair' {
     It 'judges administrators_authorized_keys like OpenSSH (write rights only for Administrators and SYSTEM)' -Skip:($env:OS -ne 'Windows_NT') {
         $file = Join-Path $TestDrive 'administrators_authorized_keys'
         Set-Content -LiteralPath $file -Value 'ssh-ed25519 AAAA test'
-        # The test user holds write rights through inheritance.
+        # The test user holds write rights (explicit entry in the user's temp folder).
         Test-AdminKeysAcl $file | Should -BeFalse
-        & "$env:WINDIR\System32\icacls.exe" $file /inheritance:r /grant '*S-1-5-32-544:F' /grant '*S-1-5-18:F' | Out-Null
-        $LASTEXITCODE | Should -Be 0
+        # The repair must also remove explicit entries, which icacls /inheritance:r keeps.
+        Set-AdminKeysAcl $file
         $after = Test-AdminKeysAcl $file
         if (-not $after) { & "$env:WINDIR\System32\icacls.exe" $file | Out-Host }
         $after | Should -BeTrue
@@ -164,5 +164,18 @@ Describe 'SSH repair' {
         Test-AdminKeysAcl $file | Should -BeTrue
         & "$env:WINDIR\System32\icacls.exe" $file /grant '*S-1-5-32-545:M' | Out-Null
         Test-AdminKeysAcl $file | Should -BeFalse
+        (Get-Acl -LiteralPath $file).GetOwner([Security.Principal.SecurityIdentifier]).Value | Should -Be 'S-1-5-32-544'
+    }
+    It 'builds the admin keys repair as an unbound script block that can call Set-AdminKeysAcl' {
+        Mock Get-SshCapabilityState { 'Installed' }
+        Mock Test-Path { param($LiteralPath) $LiteralPath -notlike '*SysadminToolkit-RemoteHelp*' }
+        Mock Test-SshConfigValid { $true }
+        Mock Test-AdminKeysAcl { $false }
+        Mock Get-SshServiceInfo { [pscustomobject]@{ StartMode = 'Manual'; State = 'Running' } }
+        Mock Set-AdminKeysAcl {}
+        $finding = @(Get-SshFindings | Where-Object { $_.Name -eq 'Schluesseldatei der Administratoren' })
+        $finding.Count | Should -Be 1
+        & $finding[0].Fix
+        Should -Invoke Set-AdminKeysAcl -Times 1 -Exactly -ParameterFilter { $Path -like '*\ssh\administrators_authorized_keys' -or $Path -like '*/ssh/administrators_authorized_keys' }
     }
 }

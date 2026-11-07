@@ -52,6 +52,21 @@ function Test-AdminKeysAcl([string]$Path) {
     return $true
 }
 
+# Replaces the whole DACL: only Administrators and SYSTEM with full control, no inheritance,
+# owner Administrators. Unlike "icacls /inheritance:r /grant ..." this also drops explicit
+# entries of other accounts.
+function Set-AdminKeysAcl([string]$Path) {
+    $admins = New-Object System.Security.Principal.SecurityIdentifier('S-1-5-32-544')
+    $system = New-Object System.Security.Principal.SecurityIdentifier('S-1-5-18')
+    $acl = New-Object System.Security.AccessControl.FileSecurity
+    $acl.SetAccessRuleProtection($true, $false)
+    foreach ($sid in @($admins, $system)) {
+        $acl.AddAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule($sid, 'FullControl', 'Allow')))
+    }
+    $acl.SetOwner($admins)
+    Set-Acl -LiteralPath $Path -AclObject $acl
+}
+
 function Get-SshFindings {
     $p = Get-SshPaths
     $findings = New-Object System.Collections.Generic.List[object]
@@ -92,10 +107,7 @@ function Get-SshFindings {
     } else { $findings.Add((New-SshFinding 'Konfiguration' $true 'SSH-Konfiguration ist fehlerfrei.')) }
 
     if ((Test-Path -LiteralPath $p.AdminKeys) -and -not (Test-AdminKeysAcl $p.AdminKeys)) {
-        $findings.Add((New-SshFinding 'Schluesseldatei der Administratoren' $false 'administrators_authorized_keys erlaubt anderen Konten das Schreiben; SSH ignoriert die Datei dann und Schluessel-Anmeldungen von Administratoren scheitern. Behebung: Rechte auf Administratoren und SYSTEM beschraenken (wie von Microsoft beschrieben).' {
-            & "$env:WINDIR\System32\icacls.exe" $p.AdminKeys /inheritance:r /grant '*S-1-5-32-544:F' /grant '*S-1-5-18:F' | Out-Null
-            if ($LASTEXITCODE -ne 0) { throw "icacls meldet Fehlercode $LASTEXITCODE." }
-        }.GetNewClosure()))
+        $findings.Add((New-SshFinding 'Schluesseldatei der Administratoren' $false 'administrators_authorized_keys erlaubt anderen Konten das Schreiben; SSH ignoriert die Datei dann und Schluessel-Anmeldungen von Administratoren scheitern. Behebung: Rechte neu setzen, nur Administratoren und SYSTEM.' ([scriptblock]::Create("Set-AdminKeysAcl -Path '$($p.AdminKeys)'"))))
     }
 
     $service = Get-SshServiceInfo

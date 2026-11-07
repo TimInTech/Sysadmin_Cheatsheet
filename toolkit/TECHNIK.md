@@ -47,7 +47,7 @@ Windows bietet im Ordner `windows/zusatz` die Dateien `SYSTEMINFO.cmd`, `WINDOWS
 - `Add-WindowsCapability OpenSSH.Server`; eine dabei neu angelegte Regel `OpenSSH-Server-In-TCP` wird wie in `START_HIER` wieder entfernt
 - `ssh-keygen -A` bei fehlendem `ssh_host_ed25519_key`
 - fehlerhafte `sshd_config` (`sshd -t` ≠ 0): Kopie nach `sshd_config.defekt-ZEITSTEMPEL`, dann `sshd_config_default`
-- `administrators_authorized_keys`, bei dem ein anderes Konto als Administratoren, SYSTEM oder TrustedInstaller Schreibrechte hat (dieselbe Regel wie `check_secure_file_permission` in Win32-OpenSSH; reine Leserechte sind erlaubt): `icacls /inheritance:r /grant *S-1-5-32-544:F /grant *S-1-5-18:F` ([Microsoft Learn](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement))
+- `administrators_authorized_keys`, bei dem ein anderes Konto als Administratoren, SYSTEM oder TrustedInstaller Schreibrechte hat (dieselbe Regel wie `check_secure_file_permission` in Win32-OpenSSH; reine Leserechte sind erlaubt): Die Zugriffsliste wird komplett neu gesetzt: nur Administratoren und SYSTEM mit Vollzugriff, ohne Vererbung, Besitzer Administratoren (`Set-AdminKeysAcl`). Der Befehl aus [Microsoft Learn](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement) (`icacls /inheritance:r /grant …`) reicht nicht immer, weil `/inheritance:r` nur vererbte Einträge entfernt. Auf dem Windows-Runner blieb dadurch ein expliziter Vollzugriff des Benutzers stehen.
 - Starttyp `Disabled` → `Manual`; gestoppter Dienst → `Start-Service`
 - Toolkit-Ordner ohne `owner.json` (abgebrochener START) → bekannte Hilfsdateien und leeren Ordner entfernen
 
