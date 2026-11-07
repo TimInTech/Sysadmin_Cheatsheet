@@ -50,7 +50,7 @@ Mit diesem Teil kann sich eine zweite Person (oder eine KI) über das **eigene H
 
 ## 1. Herunterladen
 
-1. **[Hier klicken: SSH-Toolkit.zip herunterladen](https://github.com/TimInTech/Sysadmin_Cheatsheet/releases/latest/download/SSH-Toolkit.zip)**. Der Download startet sofort (ca. 19 KB), es öffnet sich keine Webseite.
+1. **[Hier klicken: SSH-Toolkit.zip herunterladen](https://github.com/TimInTech/Sysadmin_Cheatsheet/releases/latest/download/SSH-Toolkit.zip)**. Der Download startet sofort (ca. 29 KB), es öffnet sich keine Webseite.
 2. Die Datei `SSH-Toolkit.zip` im Ordner *Downloads* mit Rechtsklick → *Alle extrahieren* entpacken.
 3. Öffne im entpackten Ordner `SSH-Toolkit`: `windows` (Windows) oder `linux` (Ubuntu/Debian).
 

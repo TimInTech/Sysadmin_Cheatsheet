@@ -4,7 +4,7 @@
 
 **Befehle und Anleitungen für Windows, Linux und Netzwerk.** Kurz erklärt, mit Warnungen vor gefährlichen Schritten.
 
-[SSH-Zugang einrichten](toolkit/README.md) &nbsp;|&nbsp; [Notfall-Spickzettel](14_Reparatur_Spickzettel/01_Notfall_Spickzettel.md) &nbsp;|&nbsp; [Toolkit-ZIP (19 KB)](https://github.com/TimInTech/Sysadmin_Cheatsheet/releases/latest/download/SSH-Toolkit.zip)
+[SSH-Zugang einrichten](toolkit/README.md) &nbsp;|&nbsp; [Notfall-Spickzettel](14_Reparatur_Spickzettel/01_Notfall_Spickzettel.md) &nbsp;|&nbsp; [Toolkit-ZIP (29 KB)](https://github.com/TimInTech/Sysadmin_Cheatsheet/releases/latest/download/SSH-Toolkit.zip)
 
 </div>
 
