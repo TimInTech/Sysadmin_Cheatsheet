@@ -1,0 +1,25 @@
+name: Vorschlag
+description: Ein fehlender Befehl, ein neues Thema oder eine bessere Erklärung.
+title: "Vorschlag: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bitte vorher kurz suchen, ob es das Thema schon gibt. Die Regeln stehen in CONTRIBUTING.md.
+  - type: textarea
+    id: idee
+    attributes:
+      label: Was fehlt oder sollte besser werden?
+    validations:
+      required: true
+  - type: input
+    id: ort
+    attributes:
+      label: Wo würde es hinpassen?
+      description: Vorhandene Seite oder Ordner, z. B. 05_Proxmox_VE
+  - type: input
+    id: quelle
+    attributes:
+      label: Quelle
+      description: Offizielle Doku oder Werkzeug, gegen das sich der Vorschlag prüfen lässt
