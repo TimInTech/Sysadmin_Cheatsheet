@@ -158,7 +158,7 @@ docker run --rm -v volume_name:/data -v "$PWD:/backup:ro" alpine \
 
 ## 10. Sicheres Cleanup
 
-> **Warnung:** `docker system prune -a --volumes` löscht ungenutzte Images und Volumes unwiderruflich. Vorher Inventar, Backups und Volume-Inhalte prüfen.
+> **Warnung:** `docker system prune -a --volumes` löscht alle ungenutzten Images und alle ungenutzten **anonymen** Volumes unwiderruflich. Benannte Volumes bleiben dabei stehen; sie löscht erst `docker volume prune -a`. Vorher Inventar, Backups und Volume-Inhalte prüfen. Quellen: [docker system prune](https://docs.docker.com/reference/cli/docker/system/prune/), [docker volume prune](https://docs.docker.com/reference/cli/docker/volume/prune/) (Verhalten ab Docker Engine 23 bzw. API 1.42, geprüft mit Docker 29.1.3).
 
 ```bash
 # Speicherverbrauch detailliert anzeigen
@@ -174,6 +174,10 @@ docker volume ls --filter dangling=true
 docker system prune
 docker system df
 
-# Radikales Cleanup MIT Volumes (nur nach Prüfung)
+# Radikales Cleanup MIT anonymen Volumes (nur nach Prüfung)
 docker system prune -a --volumes
+
+# Zusätzlich ungenutzte BENANNTE Volumes löschen (Datenverlust möglich, nur nach Backup)
+docker volume ls
+docker volume prune -a
 ```

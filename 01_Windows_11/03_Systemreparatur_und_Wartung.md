@@ -49,29 +49,46 @@ fsutil dirty query C:
 
 Festplattenplatz freigeben, ohne durch grafische Menüs zu navigieren.
 
-> **Warnung:** `rd /s /q` und `del /s` löschen rekursiv und ohne Rueckfrage. Pfade vorher mit `dir` pruefen und wichtige Daten sichern.
+> **Warnung:** `del /s` löscht rekursiv und ohne Rueckfrage. Pfade vorher mit `dir` pruefen und wichtige Daten sichern.
+
+### 3.1 Datenträgerbereinigung mit gespeichertem Profil
+
+`cleanmgr /sagerun:1` führt nur die Aufgaben aus, die vorher mit `cleanmgr /sageset:1` ausgewählt wurden. Deshalb einmalig das Profil anlegen, danach läuft die Bereinigung ohne Fenster. Die Nummer `1` ist frei wählbar (0 bis 9999), muss aber bei beiden Aufrufen gleich sein. Quelle: [cleanmgr (Microsoft Learn)](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/cleanmgr). Nicht getestet.
 
 ```cmd
-:: Backup/Pruefung: Zielpfade anzeigen und Windows.old bei Bedarf extern sichern
-dir %systemdrive%\
+:: Einmalig als Administrator: Fenster oeffnet sich, gewuenschte Kategorien ankreuzen, OK
+cleanmgr /sageset:1
+
+:: Danach jederzeit: gespeichertes Profil 1 auf allen Laufwerken ausfuehren
+cleanmgr /sagerun:1
+```
+
+### 3.2 Temporäre Dateien
+
+```cmd
+:: Pruefung: Inhalt vorher ansehen
 dir %temp%
 
-:: Bereinigungswerkzeug aufrufen (Silent Mode)
-cleanmgr /sagerun:1
-
-:: Veraltete Windows-Installationen (Windows.old) sicher entfernen
-rd /s /q %systemdrive%\Windows.old
-
-:: Temporäre Dateien radikal löschen
+:: Temporaere Dateien loeschen (gesperrte Dateien bleiben stehen, das ist normal)
 del /q /f /s %temp%\*
 del /q /f /s C:\Windows\Temp\*
 
 :: Verifikation
-dir %systemdrive%\
 dir %temp%
 ```
 
-Rollback: Manuell geloeschte Ordner wie `Windows.old` lassen sich nur aus einem vorherigen Backup oder Systemimage wiederherstellen.
+### 3.3 Vorherige Windows-Installation (Windows.old)
+
+> **Warnung:** Wer `Windows.old` löscht, kann nicht mehr zur vorherigen Windows-Version zurückkehren. Laut Microsoft lässt sich das nicht rückgängig machen. Vorher prüfen, ob die neue Version zuverlässig läuft.
+
+Den Ordner nicht mit `rd` entfernen, sondern über den Weg, den Microsoft vorsieht: **Einstellungen → System → Speicher → Temporäre Dateien → „Vorherige Windows-Installation(en)“** ankreuzen und entfernen. Alternativ in der Datenträgerbereinigung über **Systemdateien bereinigen**. Quelle: [Speicherplatz freigeben (Microsoft Support)](https://support.microsoft.com/en-us/windows/free-up-drive-space-in-windows-85529ccb-c365-490d-b548-831022bc9b32). Menübezeichnungen nicht getestet.
+
+```cmd
+:: Pruefung: Ist Windows.old vorhanden?
+dir %systemdrive%\Windows.old
+```
+
+Rollback: Ein entfernter `Windows.old`-Ordner lässt sich nur aus einem vorherigen Backup oder Systemimage wiederherstellen.
 
 ## 4. Häufige Alltagsprobleme schnell lösen
 
