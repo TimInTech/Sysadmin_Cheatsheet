@@ -1,6 +1,34 @@
-# Fernzugriff per SSH – einfache Anleitung
+# Sysadmin-Toolkit: Updates, Diagnose und SSH-Zugang
 
-Mit diesem Paket kann sich eine zweite Person über das **eigene Heimnetz** auf deinem Computer anmelden, zum Beispiel, um etwas zu reparieren oder ein System neu aufzusetzen. Die Verbindung heißt **SSH**: Man tippt Befehle in ein Textfenster, und sie werden auf deinem Computer ausgeführt.
+Drei voneinander **unabhängige** Werkzeuge in einem kleinen Paket. Du brauchst nur das, was du gerade willst. **SSH musst du für Updates und Diagnose nicht einrichten.**
+
+## Was möchtest du tun?
+
+| Ich möchte ... | Datei (im Ordner `windows`) | SSH nötig? |
+| --- | --- | --- |
+| Nach der Neuinstallation **alle Windows-Updates und Treiber** holen | `WINDOWS_AKTUALISIEREN.cmd` (Rechtsklick, *Als Administrator ausführen*) | Nein |
+| Den Rechner **prüfen** (Systeminfo, Windows-Diagnose, Netzwerk-Diagnose) | im Unterordner `zusatz`: `SYSTEMINFO.cmd`, `WINDOWS_DIAGNOSE.cmd`, `NETZWERK_DIAGNOSE.cmd` | Nein |
+| Den Rechner **reparieren** | im Unterordner `zusatz`: `SYSTEM_REPARIEREN.cmd` (verlangt eine Bestätigung) | Nein |
+| Jemandem **Fernzugriff** geben (zum Beispiel einer KI oder einer helfenden Person) | `START_HIER.cmd`, später `STOP_HIER.cmd` | Das ist SSH |
+| Den SSH-Dienst **reparieren** | im Unterordner `zusatz`: `SSH_REPARIEREN.cmd` | Nur wenn SSH genutzt wird |
+
+Ein Doppelklick auf eine Datei reicht, ein anderes Programm muss vorher nicht laufen. Unter Ubuntu und Debian gibt es im Ordner `linux` nur den SSH-Zugang (`START_HIER.sh`, `STOP_HIER.sh`). Updates und Diagnose stehen dort in der [Linux-Sammlung](../02_Linux/01_Update_und_Bereinigung.md).
+
+## Teil 1: Windows aktualisieren (nach Neuinstallation)
+
+1. Rechtsklick auf **`WINDOWS_AKTUALISIEREN.cmd`** → **Als Administrator ausführen**, mit **Ja** bestätigen.
+2. Mit `j` bestätigen. Das Programm lädt das Update-Modul und installiert bis zu vier Durchläufe Updates und Treiber über Microsoft Update.
+3. Es startet **nicht von selbst neu**. Wenn es einen Neustart verlangt, starte neu und führe die Datei **noch einmal** aus, bis keine neuen Updates mehr erscheinen. Meist reichen ein bis zwei Neustarts.
+
+Die Hintergründe und die einzelnen Befehle stehen in [Windows komplett aktualisieren](../01_Windows_11/01_Update_und_Upgrade.md#1-nach-der-neuinstallation-alles-in-einem-durchlauf). Dafür ist Windows PowerShell 5.1 nötig (das normale blaue Windows-PowerShell, das jedes Windows 10 und 11 mitbringt).
+
+## Teil 2: Diagnose und Reparatur
+
+Im Ordner `windows\zusatz` liegen kleine Programme, die einen Bericht im Fenster ausgeben. Sie ändern nichts, außer `SYSTEM_REPARIEREN.cmd` (verlangt eine Bestätigung) und `SSH_REPARIEREN.cmd`.
+
+## Teil 3: Fernzugriff per SSH
+
+Mit diesem Teil kann sich eine zweite Person (oder eine KI) über das **eigene Heimnetz** auf deinem Computer anmelden, zum Beispiel, um etwas zu reparieren oder ein System neu aufzusetzen. Die Verbindung heißt **SSH**: Man tippt Befehle in ein Textfenster, und sie werden auf deinem Computer ausgeführt.
 
 ## Das Wichtigste vorab
 
