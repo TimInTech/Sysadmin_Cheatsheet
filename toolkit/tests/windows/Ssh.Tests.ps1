@@ -5,6 +5,12 @@ Describe 'SSH starter' {
         [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $root 'SSH_EINRICHTEN.ps1'), [ref]$tokens, [ref]$errors)
         @($errors).Count | Should -Be 0
     }
+    It 'update script parses in Windows PowerShell' {
+        $tokens = $null; $errors = $null
+        [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $root 'Aktualisieren.ps1'), [ref]$tokens, [ref]$errors)
+        @($errors).Count | Should -Be 0
+        Test-Path (Join-Path $root 'WINDOWS_AKTUALISIEREN.cmd') | Should -BeTrue
+    }
     It 'has both local starter files' {
         Test-Path (Join-Path $root 'START_HIER.cmd') | Should -BeTrue
         Test-Path (Join-Path $root 'STOP_HIER.cmd') | Should -BeTrue
