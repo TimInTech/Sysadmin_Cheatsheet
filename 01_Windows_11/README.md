@@ -34,3 +34,6 @@
 
 - **[11 OpenSSH-Server und Ubuntu-Zugriff](11_OpenSSH_Server_Ubuntu_Zugriff.md)**
   OpenSSH unter Windows 10/11 einrichten, LAN-Firewall prüfen, von Ubuntu verbinden sowie SSH/SCP/SFTP diagnostizieren.
+
+- **[12 Skript-Baukasten: aufräumen, Datenschutz, Programme](12_Skript_Baukasten_Aufraeumen_und_Datenschutz.md)**
+  Eigenes PowerShell-Skript mit Trockenlauf, Wiederherstellungspunkt und Protokoll: Programme installieren, vorinstallierte Apps entfernen, zwei Datenschutz-Einstellungen. Mit Hinweis auf winscript als Alternative.
