@@ -25,7 +25,7 @@ Du brauchst den **ganzen** Ordner `windows` beziehungsweise `linux`, nicht nur e
 
 1. Rechtsklick auf **`START_HIER.cmd`** → **Als Administrator ausführen**.
 2. Windows fragt, ob die App Änderungen vornehmen darf: **Ja**.
-3. Es erscheint eine Liste deiner Netzwerke. Tippe die **Nummer** des Heimnetzes ein und drücke Enter.
+3. Das Programm sucht dein Heimnetz. Ist **nur ein Netzwerk** vorhanden (der Normalfall, zum Beispiel nur WLAN), wählt es das **automatisch**. Nur bei **mehreren** Netzwerken erscheint eine nummerierte Liste (zum Beispiel `1) Ethernet`, `2) WLAN`). Tippe dann die Zahl vor der Zeile ein, in der auch der andere Computer hängt, und drücke Enter.
 4. Tippe **`1`** (zwei Stunden) oder **`2`** (dauerhaft) und drücke Enter.
 5. Im Fenster stehen jetzt **IP-Adresse, Benutzername, Passwort** und eine Zeile, die mit `ssh` beginnt. Gib diese Angaben der Person, die sich verbinden soll. Das Passwort nur persönlich, per Telefon oder in einem sicheren Chat weitergeben.
 
@@ -40,7 +40,7 @@ Beim ersten Start lädt Windows eventuell die SSH-Komponente nach. Dafür muss d
    sudo bash START_HIER.sh
    ```
 
-3. Wähle die Nummer des Heimnetzes und danach `1` (zwei Stunden) oder `2` (dauerhaft).
+3. Bei einem einzelnen Netzwerk wählt das Programm es automatisch. Bei mehreren: Tippe die Zahl vor der Zeile deines Heimnetzes. Danach `1` (zwei Stunden) oder `2` (dauerhaft).
 4. Gib die angezeigten Angaben an die andere Person weiter.
 
 ## 3. Verbinden (auf dem anderen Computer)
