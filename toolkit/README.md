@@ -6,17 +6,17 @@ Drei voneinander **unabhängige** Werkzeuge in einem kleinen Paket. Du brauchst 
 
 | Ich möchte ... | Datei (im Ordner `windows`) | SSH nötig? |
 | --- | --- | --- |
-| Nach der Neuinstallation **alle Windows-Updates und Treiber** holen | `WINDOWS_AKTUALISIEREN.cmd` (Rechtsklick, *Als Administrator ausführen*) | Nein |
+| Nach der Neuinstallation **alle Windows-Updates und Treiber** holen | `WINDOWS_AKTUALISIEREN.cmd` | Nein |
 | Den Rechner **prüfen** (Systeminfo, Windows-Diagnose, Netzwerk-Diagnose) | im Unterordner `zusatz`: `SYSTEMINFO.cmd`, `WINDOWS_DIAGNOSE.cmd`, `NETZWERK_DIAGNOSE.cmd` | Nein |
 | Den Rechner **reparieren** | im Unterordner `zusatz`: `SYSTEM_REPARIEREN.cmd` (verlangt eine Bestätigung) | Nein |
 | Jemandem **Fernzugriff** geben (zum Beispiel einer KI oder einer helfenden Person) | `START_HIER.cmd`, später `STOP_HIER.cmd` | Das ist SSH |
-| Den SSH-Dienst **reparieren** | im Unterordner `zusatz`: `SSH_REPARIEREN.cmd` | Nur wenn SSH genutzt wird |
+| Den SSH-Zugang **reparieren** (prüft zuerst, repariert nach Bestätigung) | im Unterordner `zusatz`: `SSH_REPARIEREN.cmd` | Nur wenn SSH genutzt wird |
 
-Ein Doppelklick auf eine Datei reicht, ein anderes Programm muss vorher nicht laufen. Unter Ubuntu und Debian gibt es im Ordner `linux` nur den SSH-Zugang (`START_HIER.sh`, `STOP_HIER.sh`). Updates und Diagnose stehen dort in der [Linux-Sammlung](../02_Linux/01_Update_und_Bereinigung.md).
+**Nur die `.cmd`-Dateien starten**, ein Doppelklick reicht. Die `.ps1`-Dateien sind die Programme dahinter. Braucht ein Werkzeug Administratorrechte, fragt Windows selbst nach: **Ja** wählen. Danach geht es in einem **neuen Fenster** weiter, das offen bleibt, bis du Enter drückst. Jeder Schritt wird mit `[OK]` oder `[PROBLEM]` angezeigt, und am Ende steht, was geändert wurde. Unter Ubuntu und Debian gibt es im Ordner `linux` nur den SSH-Zugang (`START_HIER.sh`, `STOP_HIER.sh`). Updates und Diagnose stehen dort in der [Linux-Sammlung](../02_Linux/01_Update_und_Bereinigung.md).
 
 ## Teil 1: Windows aktualisieren (nach Neuinstallation)
 
-1. Rechtsklick auf **`WINDOWS_AKTUALISIEREN.cmd`** → **Als Administrator ausführen**, mit **Ja** bestätigen.
+1. Doppelklick auf **`WINDOWS_AKTUALISIEREN.cmd`**. Windows fragt nach Administratorrechten: **Ja**.
 2. Mit `j` bestätigen. Das Programm lädt das Update-Modul und installiert bis zu vier Durchläufe Updates und Treiber über Microsoft Update.
 3. Es startet **nicht von selbst neu**. Wenn es einen Neustart verlangt, starte neu und führe die Datei **noch einmal** aus, bis keine neuen Updates mehr erscheinen. Meist reichen ein bis zwei Neustarts.
 
@@ -24,7 +24,18 @@ Die Hintergründe und die einzelnen Befehle stehen in [Windows komplett aktualis
 
 ## Teil 2: Diagnose und Reparatur
 
-Im Ordner `windows\zusatz` liegen kleine Programme, die einen Bericht im Fenster ausgeben. Sie ändern nichts, außer `SYSTEM_REPARIEREN.cmd` (verlangt eine Bestätigung) und `SSH_REPARIEREN.cmd`.
+Im Ordner `windows\zusatz` liegen kleine Programme, die einen Bericht im Fenster ausgeben. Sie ändern nichts, außer `SYSTEM_REPARIEREN.cmd` und `SSH_REPARIEREN.cmd`. Beide prüfen zuerst und ändern erst, wenn du `JA` eintippst.
+
+**`SSH_REPARIEREN.cmd`** prüft und behebt auf Wunsch:
+
+1. OpenSSH-Server fehlt → wird nachgeladen (Internet nötig)
+2. Hostschlüssel fehlt → wird erzeugt
+3. SSH-Konfiguration fehlt oder ist fehlerhaft → die alte Datei wird gesichert, die Windows-Standardkonfiguration eingesetzt
+4. `administrators_authorized_keys` erlaubt anderen Konten das Schreiben → Rechte werden neu gesetzt, nur Administratoren und SYSTEM
+5. SSH-Dienst deaktiviert oder gestoppt → wird auf „Manuell“ gestellt bzw. gestartet
+6. Reste eines abgebrochenen `START_HIER` → werden entfernt
+
+Danach prüft es noch einmal. Eine Firewall-Freigabe legt es **nicht** an; das macht `START_HIER` beim Einschalten, und zwar nur für das Heimnetz.
 
 ## Teil 3: Fernzugriff per SSH
 
@@ -51,11 +62,11 @@ Du brauchst den **ganzen** Ordner `windows` beziehungsweise `linux`, nicht nur e
 
 ### Windows 10 und 11
 
-1. Rechtsklick auf **`START_HIER.cmd`** → **Als Administrator ausführen**.
-2. Windows fragt, ob die App Änderungen vornehmen darf: **Ja**.
+1. Doppelklick auf **`START_HIER.cmd`**.
+2. Windows fragt, ob die App Änderungen vornehmen darf: **Ja**. Es öffnet sich ein neues Fenster, das die sechs Schritte einzeln mit `[OK]` anzeigt.
 3. Das Programm sucht dein Heimnetz. Ist **nur ein Netzwerk** vorhanden (der Normalfall, zum Beispiel nur WLAN), wählt es das **automatisch**. Nur bei **mehreren** Netzwerken erscheint eine nummerierte Liste (zum Beispiel `1) Ethernet`, `2) WLAN`). Tippe dann die Zahl vor der Zeile ein, in der auch der andere Computer hängt, und drücke Enter.
 4. Tippe **`1`** (zwei Stunden) oder **`2`** (dauerhaft) und drücke Enter.
-5. Im Fenster stehen jetzt **IP-Adresse, Benutzername, Passwort** und eine Zeile, die mit `ssh` beginnt. Gib diese Angaben der Person, die sich verbinden soll. Das Passwort nur persönlich, per Telefon oder in einem sicheren Chat weitergeben.
+5. Am Ende steht **„FERTIG: Zugang ist eingeschaltet“**, eine Liste der Änderungen sowie **IP-Adresse, Benutzername, Passwort** und eine Zeile, die mit `ssh` beginnt. Gib diese Angaben der Person, die sich verbinden soll. Das Passwort nur persönlich, per Telefon oder in einem sicheren Chat weitergeben.
 
 Beim ersten Start lädt Windows eventuell die SSH-Komponente nach. Dafür muss der Computer online sein.
 
@@ -83,7 +94,7 @@ Dann das Passwort eingeben. Beim Tippen erscheint **nichts** auf dem Bildschirm,
 
 ## 4. Zugang ausschalten
 
-- **Windows:** Rechtsklick auf **`STOP_HIER.cmd`** → *Als Administrator ausführen*.
+- **Windows:** Doppelklick auf **`STOP_HIER.cmd`**, Windows-Abfrage mit **Ja** bestätigen. Jeder entfernte Teil wird mit `[OK]` angezeigt.
 - **Ubuntu/Debian:** `sudo bash STOP_HIER.sh`
 
 Der zusätzliche Benutzer und die Freigabe werden entfernt. Deine Dateien und der installierte SSH-Dienst bleiben erhalten. Läuft noch eine SSH-Sitzung, vorher die Sitzung beenden und STOP danach noch einmal starten.
@@ -93,14 +104,16 @@ Der zusätzliche Benutzer und die Freigabe werden entfernt. Deine Dateien und de
 | Problem | Lösung |
 | --- | --- |
 | Windows zeigt „Der Computer wurde durch Windows geschützt“ | **Weitere Informationen** → **Trotzdem ausführen**. Die Datei kommt aus dem Download. |
-| „Bitte als Administrator ausführen“ | Nicht doppelklicken, sondern per **Rechtsklick → Als Administrator ausführen**. |
-| Das Fenster schließt sich sofort | Die Datei liegt allein im Ordner. Den ganzen Ordner `windows` entpackt lassen. |
+| „Die Administratorrechte wurden nicht erteilt“ | Bei der Windows-Abfrage **Ja** wählen. Ohne Administratorrechte ändert das Toolkit nichts. |
+| Das Fenster schließt sich sofort | Eine `.ps1`-Datei wurde angeklickt oder die Datei liegt allein im Ordner. Die `.cmd`-Datei starten und den ganzen Ordner `windows` entpackt lassen. |
+| `FEHLER: Reste eines früheren Zugangs gefunden` | Zuerst `STOP_HIER.cmd`, dann `START_HIER.cmd` erneut. Hilft das nicht: `zusatz\SSH_REPARIEREN.cmd`. |
+| Rote Zeile `FEHLER: ...` | Darunter steht, was zu tun ist. Bricht `START_HIER` ab, nimmt es seine Änderungen selbst wieder zurück. |
 | Die andere Person kann sich nicht verbinden | Beide Computer müssen im **gleichen Heimnetz** sein, nicht im Gastnetz. Eine Firewall oder ein VPN kann die Verbindung blockieren. |
 | Linux meldet „Match-/Include-Regeln prüfen“ | Es gibt eine eigene SSH-Konfiguration. Das Skript bricht dann zur Sicherheit ab. Siehe [TECHNIK.md](TECHNIK.md). |
 
 ## Weitere Werkzeuge
 
-Im Ordner `windows/zusatz` liegen Hilfen für die Fehlersuche unter Windows (Systeminfo, Windows-Diagnose, Netzwerk-Diagnose, SSH reparieren, System reparieren). Sie sind für den Fernzugriff nicht nötig. `SYSTEM_REPARIEREN` verlangt eine ausdrückliche Bestätigung.
+Im Ordner `windows/zusatz` liegen Hilfen für die Fehlersuche unter Windows (Systeminfo, Windows-Diagnose, Netzwerk-Diagnose, SSH reparieren, System reparieren). Sie sind für den Fernzugriff nicht nötig. `SYSTEM_REPARIEREN` und `SSH_REPARIEREN` ändern erst nach Eingabe von `JA`.
 
 ## Für Fachleute
 
@@ -109,3 +122,5 @@ Aufbau, Sicherheitsmerkmale, Tests und Grenzen: [TECHNIK.md](TECHNIK.md).
 ## Teststand
 
 Praktisch getestet: Windows 10 (Einrichtung, Passwortanmeldung, STOP, automatischer Ablauf; Verbindung zu Ubuntu in beide Richtungen). **Nicht** praktisch getestet: Linux START/STOP und Windows 11.
+
+Die automatische Abfrage der Administratorrechte, die Schrittanzeige und die Reparatur in `SSH_REPARIEREN` sind mit automatischen Tests (Pester, Windows-CI) geprüft, aber noch **nicht praktisch** auf einem Windows-Rechner getestet.
