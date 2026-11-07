@@ -1,0 +1,42 @@
+name: Fehler melden
+description: Ein Befehl funktioniert nicht, ist veraltet oder eine Anleitung ist falsch.
+title: "Fehler: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke für den Hinweis. Bitte keine Passwörter, Tokens, privaten IP-Adressen oder Hostnamen aus deinem Netz einfügen.
+  - type: input
+    id: seite
+    attributes:
+      label: Betroffene Seite
+      description: Pfad oder Link zur Seite, z. B. 02_Linux/04_SSH_und_Remote_Zugriff.md, Abschnitt 7
+    validations:
+      required: true
+  - type: textarea
+    id: befehl
+    attributes:
+      label: Befehl und Ausgabe
+      description: Was hast du ausgeführt und was kam heraus?
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: erwartet
+    attributes:
+      label: Was hast du erwartet?
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: System und Version
+      description: z. B. Ubuntu 26.04, Windows 11 24H2, Proxmox VE 9.0, Werkzeugversion aus --version
+    validations:
+      required: true
+  - type: input
+    id: quelle
+    attributes:
+      label: Quelle (optional)
+      description: Link zur offiziellen Doku, die das richtige Verhalten belegt

@@ -27,6 +27,7 @@
 - **Einfache Sprache zuerst, Technik darunter.** Jede Seite beginnt mit einer kurzen Erklärung.
 - **Nichts erfunden.** Befehle sind gegen Hilfe oder Dokumentation geprüft. Was nicht getestet ist, steht dabei.
 - **Freie KI ohne Konto:** [Anleitung](09_KI_CLI_Slash-Befehle/00_Freie_KI_ohne_Konto.md).
+- **Mitmachen:** Fehler melden oder Vorschläge machen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Sicherheitshinweis
 
