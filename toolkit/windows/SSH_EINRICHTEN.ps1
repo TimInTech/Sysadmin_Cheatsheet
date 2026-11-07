@@ -83,11 +83,17 @@ $addresses = @(Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.IPAddres
     }
 })
 if (-not $addresses.Count) { throw 'Kein geeignetes physisches privates IPv4-Netz gefunden.' }
-for ($i=0; $i -lt $addresses.Count; $i++) { Write-Host ("{0}) {1}: {2} ({3})" -f ($i+1),$addresses[$i].Adapter,$addresses[$i].IP,$addresses[$i].Network) }
-$selection = 0
-if (-not [int]::TryParse((Read-Host 'Netznummer'), [ref]$selection) -or $selection -lt 1 -or $selection -gt $addresses.Count) { throw 'Ungueltige Netznummer.' }
+if ($addresses.Count -eq 1) {
+    $selection = 1
+    Write-Host ("Es wurde ein Netzwerk gefunden und automatisch gewaehlt: {0}: {1} ({2})" -f $addresses[0].Adapter,$addresses[0].IP,$addresses[0].Network)
+} else {
+    Write-Host 'Es wurden mehrere Netzwerke gefunden. Waehle das Heimnetz, in dem auch der andere Computer ist (Kabel oder WLAN zu Hause):'
+    for ($i=0; $i -lt $addresses.Count; $i++) { Write-Host ("{0}) {1}: {2} ({3})" -f ($i+1),$addresses[$i].Adapter,$addresses[$i].IP,$addresses[$i].Network) }
+    $selection = 0
+    if (-not [int]::TryParse((Read-Host 'Nummer des Heimnetzes (zum Beispiel 1)'), [ref]$selection) -or $selection -lt 1 -or $selection -gt $addresses.Count) { throw 'Ungueltige Auswahl.' }
+}
 $selected = $addresses[$selection-1]
-$mode = (Read-Host '1 = temporaer (2 Stunden), 2 = dauerhaft').Trim()
+$mode = (Read-Host 'Zugang: 1 = nur 2 Stunden (empfohlen), 2 = dauerhaft. Bitte 1 oder 2 eingeben').Trim()
 if ($mode -notin @('1','2')) { throw 'Ungueltige Auswahl.' }
 $name = 'remotehelp'; $suffix = 0
 while (Get-LocalUser -Name $name -ErrorAction SilentlyContinue) { $suffix++; $name = "remotehelp$suffix"; if ($suffix -gt 99) { throw 'Kein freier Benutzername.' } }

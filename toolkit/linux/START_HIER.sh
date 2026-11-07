@@ -73,11 +73,17 @@ PY
   ); then networks+=("$dev $network"); fi
 done
 ((${#networks[@]})) || { echo 'Kein geeignetes physisches privates IPv4-Netz gefunden.' >&2; exit 1; }
-for i in "${!networks[@]}"; do printf '%s) %s\n' "$((i+1))" "${networks[$i]}"; done
-read -r -p 'Netznummer: ' selection
-if [[ ! $selection =~ ^[0-9]+$ ]] || ((selection < 1 || selection > ${#networks[@]})); then echo 'Ungültige Auswahl.' >&2; exit 1; fi
+if ((${#networks[@]} == 1)); then
+  selection=1
+  echo "Es wurde ein Netzwerk gefunden und automatisch gewählt: ${networks[0]}"
+else
+  echo 'Es wurden mehrere Netzwerke gefunden. Wähle das Heimnetz, in dem auch der andere Computer ist (Kabel oder WLAN zu Hause):'
+  for i in "${!networks[@]}"; do printf '%s) %s\n' "$((i+1))" "${networks[$i]}"; done
+  read -r -p 'Nummer des Heimnetzes (zum Beispiel 1): ' selection
+  if [[ ! $selection =~ ^[0-9]+$ ]] || ((selection < 1 || selection > ${#networks[@]})); then echo 'Ungültige Auswahl.' >&2; exit 1; fi
+fi
 read -r dev address network <<< "${networks[$((selection-1))]}"
-read -r -p '1 = temporär (2 Stunden), 2 = dauerhaft: ' mode
+read -r -p 'Zugang: 1 = nur 2 Stunden (empfohlen), 2 = dauerhaft. Bitte 1 oder 2 eingeben: ' mode
 [[ $mode == 1 || $mode == 2 ]] || { echo 'Ungültige Auswahl.' >&2; exit 1; }
 name=remotehelp; suffix=0
 while getent passwd "$name" >/dev/null; do suffix=$((suffix+1)); name="remotehelp$suffix"; ((suffix <= 99)) || { echo 'Kein freier Benutzername.' >&2; exit 1; }; done
