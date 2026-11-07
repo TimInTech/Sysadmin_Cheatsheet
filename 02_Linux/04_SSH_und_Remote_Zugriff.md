@@ -159,3 +159,68 @@ Host *
     ServerAliveInterval 60
     ServerAliveCountMax 3
 ```
+
+## 7. SSH-Server härten
+
+Kurz gesagt: Anmeldung nur noch mit Schlüssel, kein direkter Root-Login, wenige Fehlversuche. Mehr braucht ein typischer Heim- oder Laborserver nicht. Die Verschlüsselungsverfahren (Kex, Ciphers, MACs) bleiben auf den Standardwerten: Aktuelles OpenSSH wählt sie bereits sicher, und eigene Listen schalten oft neuere Verfahren ab. OpenSSH 10.2 nutzt zum Beispiel zuerst den Post-Quanten-Schlüsseltausch `mlkem768x25519-sha256`, der in vielen alten Härtungsanleitungen fehlt.
+
+> **Warnung:** Mit `PasswordAuthentication no` kommt nur noch rein, wessen öffentlicher Schlüssel in `~/.ssh/authorized_keys` liegt. Vorher die Anmeldung per Schlüssel testen und eine zweite Sitzung offen lassen (siehe [Abschnitt 5](#5-remote-lockout-vermeiden)). Sonst sperrst du dich aus.
+
+### 7.1 Vorher prüfen
+
+```bash
+# Muss ohne Passwortabfrage klappen (von einem zweiten Terminal aus)
+ssh -o PasswordAuthentication=no benutzer@server_ip true && echo "Schlüssel-Login funktioniert"
+
+# Vorhandene Zusatzdateien ansehen (z. B. 50-cloud-init.conf mit PasswordAuthentication yes)
+ls -l /etc/ssh/sshd_config.d/
+```
+
+### 7.2 Härtung als eigene Datei
+
+sshd übernimmt für jede Option den **ersten** gefundenen Wert. Die Datei heißt deshalb `00-haertung.conf`, damit sie vor anderen Zusatzdateien gelesen wird. Das setzt voraus, dass `/etc/ssh/sshd_config` die Zusatzdateien am Anfang einbindet (`Include /etc/ssh/sshd_config.d/*.conf`), wie unter Ubuntu und Debian üblich.
+
+```bash
+sudo tee /etc/ssh/sshd_config.d/00-haertung.conf >/dev/null <<'EOF'
+# Nur Schlüssel-Anmeldung
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+# Kein direkter Root-Login
+PermitRootLogin no
+# Weniger Fehlversuche und kürzere Wartezeit
+MaxAuthTries 3
+LoginGraceTime 30
+EOF
+```
+
+`Protocol 2` aus älteren Anleitungen ist überflüssig: Seit OpenSSH 7.4 gibt es nur noch Protokoll 2.
+
+### 7.3 Prüfen, anwenden, kontrollieren
+
+```bash
+# 1. Syntax prüfen; bei Fehlern NICHT weitermachen
+sudo sshd -t
+
+# 2. Wirksame Werte anzeigen
+sudo sshd -T | grep -Ei '^(permitrootlogin|passwordauthentication|kbdinteractiveauthentication|maxauthtries|logingracetime)'
+
+# 3. Konfiguration neu laden (Ubuntu/Debian: ssh, Fedora/Bazzite: sshd)
+sudo systemctl reload ssh
+
+# 4. In einem NEUEN Terminal anmelden, erst danach die alte Sitzung schließen
+ssh benutzer@server_ip
+```
+
+Bestehende Sitzungen bleiben beim Neuladen offen. Läuft `ssh.service` unter Ubuntu gerade nicht (Socket-Aktivierung), meldet `reload` einen Fehler. Das ist dann unkritisch, weil die nächste Verbindung die neue Konfiguration liest.
+
+**Rollback:**
+
+```bash
+sudo rm /etc/ssh/sshd_config.d/00-haertung.conf
+sudo sshd -t && sudo systemctl reload ssh
+```
+
+Getestet auf: Ubuntu 26.04 mit OpenSSH 10.2p1 (Syntax und wirksame Werte mit `sshd -t` und `sshd -T` in einer Testkonfiguration geprüft, kein Live-Server). Quelle: [sshd_config(5)](https://man.openbsd.org/sshd_config).
+
+**Firewall und Sperren nach Fehlversuchen** stehen auf eigenen Seiten: [Netzwerk und Dienste (UFW)](03_Netzwerk_und_Dienste.md), [nftables Firewall](11_Nftables_Firewall.md) und [Fail2ban](20_Fail2ban.md).

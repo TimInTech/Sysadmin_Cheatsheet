@@ -12,7 +12,7 @@
   Systemd-Services steuern, Live-Logs lesen und UFW-Firewall Standardregeln.
 
 - **[04 SSH und Remote-Zugriff](04_SSH_und_Remote_Zugriff.md)**
-  SSH-Troubleshooting, Permission-Fixes und lokales/dynamisches Port-Forwarding.
+  SSH-Troubleshooting, Permission-Fixes, Port-Forwarding und Server-Härtung (nur Schlüssel, kein Root-Login).
 
 - **[05 Speicher und Performance](05_Speicher_und_Performance.md)**
   Fehlerdiagnose bei vollen Festplatten (df, du, ncdu) und hängenden Systemen (htop, ps, kill).
@@ -63,7 +63,7 @@
   Brute-Force-Schutz: Status, Jails, Logs und Entsperren.
 
 - **[21 Audit Logs](21_Audit_Logs.md)**
-  Auth-, Sudo-, Auditd- und Login-Logs auswerten.
+  Auth-, Sudo-, Auditd- und Login-Logs auswerten, SUID-Dateien prüfen.
 
 - **[22 Secret Hygiene](22_Secret_Hygiene.md)**
   Shell-History, Git-Grep nach Secrets und .env-Dateien absichern.
