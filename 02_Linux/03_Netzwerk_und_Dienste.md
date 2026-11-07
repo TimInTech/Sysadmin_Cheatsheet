@@ -27,6 +27,22 @@ ip neigh
 ethtool "$(ip route | awk '/default/ {print $5; exit}')" 2>/dev/null || true
 ```
 
+### 0.1 Weg zum Ziel prüfen (mtr)
+
+Wenn `ping` mal klappt und mal nicht, zeigt `mtr`, an welcher Station auf dem Weg Pakete verloren gehen. Es kombiniert `ping` und `traceroute` und läuft ohne `sudo`.
+
+```bash
+# Paket installieren (Ubuntu/Debian; mtr-tiny reicht für die Konsole)
+sudo apt install mtr-tiny
+
+# Bericht nach 100 Durchläufen: Verlust und Laufzeit pro Station
+mtr -rwbc 100 1.1.1.1
+```
+
+`-r` erstellt einen Bericht statt der Live-Ansicht, `-w` zeigt lange Namen vollständig, `-b` zeigt Namen und IP-Adressen, `-c 100` legt die Anzahl der Durchläufe fest. Verlust nur an einer mittleren Station ist oft harmlos, weil viele Router Testpakete absichtlich langsamer beantworten. Wichtig ist der Verlust, der bis zum Ziel bestehen bleibt.
+
+Getestet auf: Ubuntu 26.04 mit mtr 0.95. DNS-Probleme stehen auf [DNS-Diagnose](23_DNS_Diagnose.md).
+
 ## 1. Systemd-Services verwalten
 
 Nahezu alle modernen Linux-Distributionen (Ubuntu, Debian, CentOS) nutzen `systemd` zur Verwaltung von Hintergrunddiensten.

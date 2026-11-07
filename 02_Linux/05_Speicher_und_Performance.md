@@ -22,9 +22,16 @@ Wenn `df -h` eine volle Platte zeigt, hilft `du` bei der Suche nach den Verursac
 # Größe aller Ordner im aktuellen Verzeichnis anzeigen
 du -sh *
 
-# Die 10 größten Verzeichnisse ab dem Wurzelverzeichnis (/) auflisten
-sudo du -a / | sort -n -r | head -n 10
+# Die größten Ordner direkt unter / (bleibt auf der Systempartition, -x)
+sudo du -xh -d1 / 2>/dev/null | sort -rh | head -n 15
+
+# Die 20 größten Dateien über 500 MB auf der Systempartition
+sudo find / -xdev -type f -size +500M -printf '%s %p\n' 2>/dev/null | sort -rn | head -n 20 | numfmt --field=1 --to=iec
 ```
+
+`-x` bzw. `-xdev` bleibt auf einem Dateisystem. Dadurch werden `/proc`, `/sys`, Netzlaufwerke und USB-Platten nicht mitgezählt. Eine eigene `/home`-Partition muss man getrennt prüfen, z. B. mit `sudo du -xh -d1 /home`. Die Suche löscht nichts. Was sich davon sicher entfernen lässt, steht unter anderem in [Update und Bereinigung](01_Update_und_Bereinigung.md) und [Docker und Container](07_Docker_und_Container.md).
+
+Getestet auf: Ubuntu 26.04 (`du` aus uutils, `find` und `numfmt` aus GNU).
 
 Alternativ `ncdu` (falls installiert) für eine interaktive, grafische Konsolenansicht nutzen:
 ```bash

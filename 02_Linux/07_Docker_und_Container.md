@@ -28,6 +28,12 @@ docker logs -f container_name_oder_id
 
 # Nur die letzten 100 Zeilen der Logs anzeigen
 docker logs --tail 100 container_name
+
+# Nur die Logs der letzten Stunde (auch 30m, 2h oder ein Datum wie 2026-11-07T08:00)
+docker logs --since 1h container_name
+
+# Logs mit Zeitstempel, z. B. um sie mit dem Systemjournal abzugleichen
+docker logs --since 1h --timestamps container_name
 ```
 
 ## 2. Container-Ressourcen und Prozesse
