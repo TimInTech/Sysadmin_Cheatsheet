@@ -13,6 +13,7 @@ if (-not (Request-ToolkitAdmin -ScriptPath $PSCommandPath -Arguments $forward)) 
 
 $exitCode = 0
 $rolledBack = $false
+$script:stopWarning = $null
 try {
     $rule = 'SysadminToolkit-RemoteHelp'
     $task = 'SysadminToolkit-RemoteHelp-Stop'
@@ -42,18 +43,20 @@ try {
     $end = "# END SYSADMIN TOOLKIT REMOTEHELP $token"
 
     function Remove-ConfigBlock {
-        if (-not (Test-Path -LiteralPath $config)) { return }
+        # Returns $true only when a toolkit block was actually removed.
+        if (-not (Test-Path -LiteralPath $config)) { return $false }
         $bytes = [IO.File]::ReadAllBytes($config)
         if (@($bytes | Where-Object { $_ -gt 127 }).Count) { throw 'SSH-Konfiguration enthaelt Nicht-ASCII-Zeichen; bitte manuell pruefen.' }
         $text = [Text.Encoding]::ASCII.GetString($bytes)
         $start = $text.IndexOf($begin, [StringComparison]::Ordinal)
         $finish = $text.IndexOf($end, [StringComparison]::Ordinal)
-        if ($start -lt 0 -and $finish -lt 0) { return }
+        if ($start -lt 0 -and $finish -lt 0) { return $false }
         if ($start -lt 0 -or $finish -lt $start -or $text.IndexOf($begin, $start + $begin.Length, [StringComparison]::Ordinal) -ge 0 -or $text.IndexOf($end, $finish + $end.Length, [StringComparison]::Ordinal) -ge 0) { throw 'SSH-Markierungen sind unvollstaendig oder mehrfach vorhanden; bitte manuell pruefen.' }
         $finish += $end.Length
         if ($text.Substring($finish).StartsWith("`r`n")) { $finish += 2 }
         elseif ($text.Substring($finish).StartsWith("`n")) { $finish++ }
         [IO.File]::WriteAllBytes($config, [Text.Encoding]::ASCII.GetBytes($text.Remove($start, $finish - $start)))
+        return $true
     }
     function Stop-Access {
         if (-not $owner) {
@@ -66,14 +69,23 @@ try {
         $existingRule = Get-NetFirewallRule -Name $rule -ErrorAction SilentlyContinue
         $existingTask = Get-ScheduledTask -TaskName $task -ErrorAction SilentlyContinue
         if ($user) { Disable-LocalUser -SID $user.SID; Write-ToolkitOk "Benutzer $($owner.name) gesperrt" }
-        if (Test-Path $sshd) {
-            Remove-ConfigBlock
+        # sshd_config may be missing (Windows creates it on the first service start); then there is
+        # nothing to remove and nothing to validate. A problem here must not block the rest of the cleanup.
+        $removed = $false
+        $configOk = $true
+        if ((Test-Path $sshd) -and (Remove-ConfigBlock)) {
+            $removed = $true
             & $sshd -t
-            if ($LASTEXITCODE -ne 0) { throw 'SSH-Konfiguration nach Entfernen der Markierung ungueltig; bitte pruefen.' }
-            Write-ToolkitOk 'Toolkit-Eintrag aus der SSH-Konfiguration entfernt'
-            if ((Get-Service sshd -ErrorAction SilentlyContinue).Status -eq 'Running') {
-                if ($owner.started) { Stop-Service sshd; Write-ToolkitOk 'SSH-Dienst gestoppt (er lief vorher nicht)' } else { Restart-Service sshd; Write-ToolkitOk 'SSH-Dienst neu gestartet (er lief schon vorher)' }
-            }
+            if ($LASTEXITCODE -ne 0) {
+                $configOk = $false
+                $script:stopWarning = 'Die SSH-Konfiguration ist nach dem Entfernen des Toolkit-Eintrags ungueltig. Bitte zusatz\SSH_REPARIEREN.cmd ausfuehren.'
+                Write-ToolkitProblem 'SSH-Konfiguration ungueltig; der SSH-Dienst wird nicht neu gestartet'
+            } else { Write-ToolkitOk 'Toolkit-Eintrag aus der SSH-Konfiguration entfernt' }
+        } else { Write-ToolkitOk 'Kein Toolkit-Eintrag in der SSH-Konfiguration' }
+        if ((Get-Service sshd -ErrorAction SilentlyContinue).Status -eq 'Running') {
+            # Stop a service the toolkit started; restart a pre-existing one only if its config changed.
+            if ($owner.started) { Stop-Service sshd; Write-ToolkitOk 'SSH-Dienst gestoppt (er lief vorher nicht)' }
+            elseif ($removed -and $configOk) { Restart-Service sshd; Write-ToolkitOk 'SSH-Dienst neu gestartet (er lief schon vorher)' }
         }
         if ($existingRule -and $existingRule.DisplayName -eq $marker) { $existingRule | Remove-NetFirewallRule; Write-ToolkitOk 'Firewall-Freigabe entfernt' }
         if ($user) { Remove-LocalUser -SID $user.SID; Write-ToolkitOk "Benutzer $($owner.name) geloescht" }
@@ -89,8 +101,9 @@ try {
         Remove-ToolkitFolder
         Write-Host ''
         Write-Host 'Der Toolkit-Zugang ist entfernt. SSH-Dienst und installierte Pakete bleiben erhalten.' -ForegroundColor Green
+        if ($script:stopWarning) { Write-ToolkitProblem $script:stopWarning }
     }
-    if ($Stop) { Stop-Access; return }
+    if ($Stop) { Stop-Access; if ($script:stopWarning) { $exitCode = 1 }; exit $exitCode }
 
     Write-ToolkitStep 'Schritt 1 von 6: Vorhandenen Zugang pruefen'
     if ((Get-NetFirewallRule -Name $rule -ErrorAction SilentlyContinue) -or (Get-ScheduledTask -TaskName $task -ErrorAction SilentlyContinue)) { throw 'Ein Toolkit-Zugang ist bereits eingeschaltet. Bitte zuerst STOP_HIER.cmd ausfuehren.' }
