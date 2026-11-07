@@ -1,9 +1,20 @@
 Describe 'SSH starter' {
     BeforeAll { $root = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'windows' }
-    It 'parses in Windows PowerShell' {
+    It 'parses in Windows PowerShell: <file>' -ForEach @(@{ file='SSH_EINRICHTEN.ps1' }, @{ file='Gemeinsam.ps1' }) {
         $tokens = $null; $errors = $null
-        [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $root 'SSH_EINRICHTEN.ps1'), [ref]$tokens, [ref]$errors)
+        [void][System.Management.Automation.Language.Parser]::ParseFile((Join-Path $root $file), [ref]$tokens, [ref]$errors)
         @($errors).Count | Should -Be 0
+    }
+    It 'contains only ASCII (Windows PowerShell 5.1 reads BOM-less scripts as ANSI): <file>' -ForEach @(
+        @{ file='SSH_EINRICHTEN.ps1' }, @{ file='Gemeinsam.ps1' }, @{ file='Aktualisieren.ps1' },
+        @{ file='zusatz\DIAGNOSE.ps1' }, @{ file='zusatz\Repair.ps1' }
+    ) {
+        $bytes = [IO.File]::ReadAllBytes((Join-Path $root $file))
+        @($bytes | Where-Object { $_ -gt 127 }).Count | Should -Be 0
+    }
+    It 'copies its helper file for the scheduled stop task' {
+        $text = Get-Content -LiteralPath (Join-Path $root 'SSH_EINRICHTEN.ps1') -Raw
+        $text | Should -Match "Copy-Item -LiteralPath \`$common -Destination \(Join-Path \`$folder 'Gemeinsam.ps1'\)"
     }
     It 'update script parses in Windows PowerShell' {
         $tokens = $null; $errors = $null

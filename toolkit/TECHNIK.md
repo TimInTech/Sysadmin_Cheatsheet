@@ -7,16 +7,18 @@ Dieses Dokument richtet sich an Personen mit IT-Kenntnissen. Die einfache Anleit
 ## Aufbau
 
 - `windows/START_HIER.cmd`, `windows/STOP_HIER.cmd`: Starter, rufen `SSH_EINRICHTEN.ps1` im selben Ordner auf.
-- `windows/zusatz/`: Diagnose- und Reparaturwerkzeuge (`SYSTEMINFO`, `WINDOWS_DIAGNOSE`, `NETZWERK_DIAGNOSE`, `SSH_REPARIEREN`, `SYSTEM_REPARIEREN`). Jede `.cmd` braucht `DIAGNOSE.ps1` und `Repair.ps1` im selben Ordner.
+- `windows/Gemeinsam.ps1`: gemeinsame Hilfsfunktionen. `Request-ToolkitAdmin` startet ein Skript ohne Administratorrechte per `Start-Process -Verb RunAs` erneut mit `-Pause`, damit das neue Fenster offen bleibt. Lehnt man die UAC-Abfrage ab, erscheint eine Erklärung und es wird nichts geändert. Dazu kommen die Ausgabefunktionen für `[OK]`, `[PROBLEM]` und `FEHLER:`.
+- `windows/zusatz/`: Diagnose- und Reparaturwerkzeuge (`SYSTEMINFO`, `WINDOWS_DIAGNOSE`, `NETZWERK_DIAGNOSE`, `SSH_REPARIEREN`, `SYSTEM_REPARIEREN`). Jede `.cmd` braucht `DIAGNOSE.ps1` und `Repair.ps1` im selben Ordner und `Gemeinsam.ps1` im übergeordneten Ordner `windows`.
+- Alle `.ps1`-Dateien sind reines ASCII, weil Windows PowerShell 5.1 Skripte ohne BOM als ANSI liest. Ein Test prüft das.
 - `linux/START_HIER.sh`, `linux/STOP_HIER.sh`: Einrichtung und Rückbau unter Ubuntu/Debian mit systemd.
 - `tests/`: Pester-Tests (Windows) und ein Test der SSH-Konfiguration (Linux); sie laufen in der CI (`.github/workflows/toolkit.yml`).
 
 ## Windows 10 und 11
 
-1. Im entpackten Ordner `toolkit/windows` die Datei `START_HIER.cmd` per Rechtsklick **als Administrator ausführen**.
+1. Im entpackten Ordner `toolkit/windows` die Datei `START_HIER.cmd` starten. Ohne Administratorrechte fordert das Skript sie selbst an (UAC) und läuft in einem neuen Fenster weiter.
 2. Das private Netzwerk und `1` für zwei Stunden oder `2` für einen dauerhaften Zugang wählen.
 3. IP-Adresse, Benutzername und Passwort stehen anschließend im Fenster. Auf dem zweiten Rechner den angezeigten `ssh`-Befehl ausführen und das angezeigte Passwort eingeben. Beim ersten Kontakt den SSH-Hostschlüssel vor Bestätigung unabhängig prüfen.
-4. Zum vorzeitigen Beenden `STOP_HIER.cmd` ebenfalls als Administrator starten. Es entfernt das vom Paket markierte Konto, die eigene SSH-Konfigurationspassage und Firewallregel sowie die eigene Aufgabe. Das installierte OpenSSH-Paket bleibt erhalten.
+4. Zum vorzeitigen Beenden `STOP_HIER.cmd` starten (fordert Administratorrechte ebenfalls selbst an). Es entfernt das vom Paket markierte Konto, die eigene SSH-Konfigurationspassage und Firewallregel sowie die eigene Aufgabe. Das installierte OpenSSH-Paket bleibt erhalten.
 
 Der temporäre Benutzer läuft nach zwei Stunden ab. Eine geplante SYSTEM-Aufgabe führt den Rückbau aus; nach einem Neustart wird der Zugang vorsorglich früher entfernt. Der Account erhält keine Administratorrechte. Windows-Hello-PIN und SSH-Passwort sind nicht dasselbe. Ein laufendes SSH-Terminal kann über den Ablauf hinaus offen bleiben; es bei Bedarf ausdrücklich schließen.
 
@@ -39,6 +41,17 @@ Der systemd-Timer führt den Rückbau nach zwei Stunden aus; bei Neustart erfolg
 ## Diagnose und Hinweise
 
 Windows bietet im Ordner `windows/zusatz` die Dateien `SYSTEMINFO.cmd`, `WINDOWS_DIAGNOSE.cmd`, `NETZWERK_DIAGNOSE.cmd`, `SSH_REPARIEREN.cmd` und `SYSTEM_REPARIEREN.cmd`. Die Diagnose löst keinen Netzwerkreset aus; die Systemreparatur verlangt eine ausdrückliche Bestätigung.
+
+`SSH_REPARIEREN` (`Invoke-SshRepair` in `Repair.ps1`) sammelt Befunde mit `Get-SshFindings`. Jeder Befund trägt eine Erklärung und, wo möglich, eine Behebung. Behoben wird erst nach `JA`; danach folgt eine erneute Prüfung, höchstens zwei Reparaturrunden. Behebungen:
+
+- `Add-WindowsCapability OpenSSH.Server`; eine dabei neu angelegte Regel `OpenSSH-Server-In-TCP` wird wie in `START_HIER` wieder entfernt
+- `ssh-keygen -A` bei fehlendem `ssh_host_ed25519_key`
+- fehlerhafte `sshd_config` (`sshd -t` ≠ 0): Kopie nach `sshd_config.defekt-ZEITSTEMPEL`, dann `sshd_config_default`
+- `administrators_authorized_keys` mit anderen ACL-Einträgen als Administratoren und SYSTEM oder mit Vererbung: `icacls /inheritance:r /grant *S-1-5-32-544:F /grant *S-1-5-18:F` ([Microsoft Learn](https://learn.microsoft.com/en-us/windows-server/administration/openssh/openssh_keymanagement))
+- Starttyp `Disabled` → `Manual`; gestoppter Dienst → `Start-Service`
+- Toolkit-Ordner ohne `owner.json` (abgebrochener START) → bekannte Hilfsdateien und leeren Ordner entfernen
+
+Firewallregeln werden nicht verändert.
 
 Der SSH-Server nutzt seine bestehende Konfiguration und erhält eine markierte Kontoregel. Das Skript prüft diese mit `sshd -t` und `sshd -T` für ausgewählte Beispieladressen; diese Prüfung beweist nicht die Wirkung für alle bestehenden `Match`- und `Include`-Regeln. Andere unabhängig betriebene SSH-Server können eigene Regeln verwenden. Eine bereits offene Firewallregel wird durch eine neue engere Regel nicht eingeschränkt; das Starten eines zuvor gestoppten SSH-Dienstes kann bestehende Konten erreichbar machen. Dienstneustarts können laufende SSH-Verbindungen betreffen. Eine Firewall oder ein isoliertes Gastnetz kann den Zugang verhindern.
 
