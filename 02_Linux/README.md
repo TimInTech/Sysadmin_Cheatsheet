@@ -88,3 +88,6 @@
 
 - **[29 Tastaturbelegung DE und UK](29_Tastaturbelegung_DE_UK.md)**
   QWERTZ/QWERTY-Unterschiede, AltGr-Zeichen und Layout-Umschaltung unter Linux.
+
+- **[30 Monitoring und Healthchecks](30_Monitoring_und_Healthchecks.md)**
+  Schneller Systemüberblick, tägliches Prüfskript mit systemd-Timer, optionale Meldung über Healthchecks.io und Prometheus Node Exporter.
